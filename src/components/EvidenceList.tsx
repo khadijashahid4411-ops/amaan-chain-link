@@ -44,12 +44,15 @@ export const EvidenceList = ({ alertId }: { alertId: string }) => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <FileCheck2 className="h-4 w-4 text-success shrink-0" />
-                <span className="text-sm font-medium truncate">{e.file_name}</span>
+                <span className="text-sm font-medium truncate">{e.title || e.file_name}</span>
               </div>
               <Badge variant="secondary" className="capitalize text-[10px]">{e.uploader_role}</Badge>
             </div>
             <div className="text-xs text-muted-foreground space-y-1">
+              {e.title && <div className="truncate">file: {e.file_name}</div>}
+              {e.description && <div className="text-sm text-foreground/80 break-words">{e.description}</div>}
               <div className="font-mono truncate">hash: {e.file_hash}</div>
+              <div className="font-mono truncate">cid: {e.ipfs_cid}</div>
               <div className="flex flex-wrap gap-3">
                 <a
                   href={e.ipfs_url}
