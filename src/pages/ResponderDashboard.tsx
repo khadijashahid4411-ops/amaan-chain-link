@@ -124,6 +124,17 @@ const ResponderDashboard = () => {
     else toast.success("Alert accepted");
   };
 
+  const reject = async (a: Alert) => {
+    if (!responder || !user) return;
+    const { error } = await supabase.from("alert_rejections").insert({
+      alert_id: a.id,
+      responder_id: responder.id,
+      user_id: user.id,
+    });
+    if (error && !error.message.includes("duplicate")) toast.error(error.message);
+    else toast.success("Alert hidden from your queue");
+  };
+
   const startProgress = async (a: Alert) => {
     await supabase.from("alerts").update({ status: "in_progress" }).eq("id", a.id);
   };
@@ -293,7 +304,7 @@ const ResponderDashboard = () => {
                   <Button size="sm" onClick={() => accept(a)}>
                     <CheckCircle2 className="h-4 w-4 mr-1" /> Accept
                   </Button>
-                  <Button size="sm" variant="ghost">
+                  <Button size="sm" variant="ghost" onClick={() => reject(a)}>
                     <XCircle className="h-4 w-4" />
                   </Button>
                 </div>
