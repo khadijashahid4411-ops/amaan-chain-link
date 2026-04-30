@@ -36,7 +36,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const UserDashboard = () => {
   const { user } = useAuth();
-  const { coords, error: geoErr } = useGeolocation();
+  const { coords, error: geoErr, loading: geoLoading, retry: retryGeo } = useGeolocation();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [responders, setResponders] = useState<Record<string, Responder>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -202,7 +202,19 @@ const UserDashboard = () => {
                     rows={4}
                   />
                 </div>
-                {geoErr && <p className="text-sm text-destructive">Location error: {geoErr}</p>}
+                {geoErr && (
+                  <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm space-y-2">
+                    <p className="text-destructive">{geoErr}</p>
+                    <Button type="button" size="sm" variant="outline" onClick={retryGeo}>
+                      <MapPin className="h-3.5 w-3.5 mr-1" /> Retry location
+                    </Button>
+                  </div>
+                )}
+                {!geoErr && geoLoading && (
+                  <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Locking your GPS…
+                  </p>
+                )}
                 {coords && (
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <MapPin className="h-3 w-3" /> Locked at {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
