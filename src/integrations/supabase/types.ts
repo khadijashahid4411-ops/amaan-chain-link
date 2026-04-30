@@ -149,31 +149,43 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          area: string | null
           avatar_url: string | null
+          cnic: string | null
           created_at: string
           display_name: string | null
           id: string
           phone: string | null
+          role_intent: string | null
           updated_at: string
           user_id: string
           wallet_address: string | null
         }
         Insert: {
+          address?: string | null
+          area?: string | null
           avatar_url?: string | null
+          cnic?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           phone?: string | null
+          role_intent?: string | null
           updated_at?: string
           user_id: string
           wallet_address?: string | null
         }
         Update: {
+          address?: string | null
+          area?: string | null
           avatar_url?: string | null
+          cnic?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           phone?: string | null
+          role_intent?: string | null
           updated_at?: string
           user_id?: string
           wallet_address?: string | null
