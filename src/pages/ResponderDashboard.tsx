@@ -37,6 +37,7 @@ const ResponderDashboard = () => {
   const { coords } = useGeolocation(true);
   const [responder, setResponder] = useState<Responder | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [rejectedAlertIds, setRejectedAlertIds] = useState<Set<string>>(new Set());
   const [registering, setRegistering] = useState(false);
   const [specialty, setSpecialty] = useState("");
 
@@ -80,6 +81,11 @@ const ResponderDashboard = () => {
         .select("*")
         .in("status", ["pending", "accepted", "in_progress"])
         .order("created_at", { ascending: false });
+      const { data: rejected } = await supabase
+        .from("alert_rejections")
+        .select("alert_id")
+        .eq("responder_id", responder.id);
+      setRejectedAlertIds(new Set((rejected ?? []).map((x) => x.alert_id)));
       setAlerts(data ?? []);
     };
     load();
@@ -132,7 +138,10 @@ const ResponderDashboard = () => {
       user_id: user.id,
     });
     if (error && !error.message.includes("duplicate")) toast.error(error.message);
-    else toast.success("Alert hidden from your queue");
+    else {
+      setRejectedAlertIds((prev) => new Set(prev).add(a.id));
+      toast.success("Alert hidden from your queue");
+    }
   };
 
   const startProgress = async (a: Alert) => {
@@ -196,6 +205,7 @@ const ResponderDashboard = () => {
   // Filter pending alerts within radius
   const pending = alerts.filter((a) => {
     if (a.status !== "pending") return false;
+    if (rejectedAlertIds.has(a.id)) return false;
     if (!coords) return true;
     return distKm(coords, { lat: a.lat, lng: a.lng }) <= RADIUS_KM;
   });
