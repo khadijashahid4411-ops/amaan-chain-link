@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_rejections: {
+        Row: {
+          alert_id: string
+          created_at: string
+          id: string
+          responder_id: string
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          id?: string
+          responder_id: string
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          id?: string
+          responder_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alerts: {
         Row: {
           accepted_at: string | null
@@ -87,6 +111,7 @@ export type Database = {
           alert_id: string
           chain_id: number | null
           created_at: string
+          description: string | null
           file_hash: string
           file_name: string
           file_size: number | null
@@ -95,6 +120,7 @@ export type Database = {
           ipfs_cid: string
           ipfs_url: string
           status: Database["public"]["Enums"]["evidence_status"]
+          title: string | null
           tx_hash: string | null
           updated_at: string
           uploaded_by: string
@@ -105,6 +131,7 @@ export type Database = {
           alert_id: string
           chain_id?: number | null
           created_at?: string
+          description?: string | null
           file_hash: string
           file_name: string
           file_size?: number | null
@@ -113,6 +140,7 @@ export type Database = {
           ipfs_cid: string
           ipfs_url: string
           status?: Database["public"]["Enums"]["evidence_status"]
+          title?: string | null
           tx_hash?: string | null
           updated_at?: string
           uploaded_by: string
@@ -123,6 +151,7 @@ export type Database = {
           alert_id?: string
           chain_id?: number | null
           created_at?: string
+          description?: string | null
           file_hash?: string
           file_name?: string
           file_size?: number | null
@@ -131,6 +160,7 @@ export type Database = {
           ipfs_cid?: string
           ipfs_url?: string
           status?: Database["public"]["Enums"]["evidence_status"]
+          title?: string | null
           tx_hash?: string | null
           updated_at?: string
           uploaded_by?: string
@@ -263,6 +293,47 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_account_setup: {
+        Args: {
+          _address?: string
+          _area?: string
+          _cnic?: string
+          _display_name?: string
+          _phone?: string
+          _role_intent?: string
+          _wallet_address?: string
+        }
+        Returns: undefined
+      }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          address: string | null
+          area: string | null
+          avatar_url: string | null
+          cnic: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          phone: string | null
+          role_intent: string | null
+          updated_at: string
+          user_id: string
+          wallet_address: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_my_roles: {
+        Args: never
+        Returns: {
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

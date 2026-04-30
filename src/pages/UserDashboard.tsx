@@ -13,7 +13,7 @@ import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { toast } from "sonner";
-import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star } from "lucide-react";
+import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { z } from "zod";
 
@@ -126,6 +126,12 @@ const UserDashboard = () => {
     toast.success("Thanks for the rating");
   };
 
+  const discardAlert = async (id: string) => {
+    const { error } = await supabase.from("alerts").update({ status: "cancelled" }).eq("id", id);
+    if (error) toast.error(error.message);
+    else toast.success("Alert discarded");
+  };
+
   const activeAlert = alerts.find((a) => ["pending", "accepted", "in_progress"].includes(a.status));
   const center = activeAlert
     ? { lat: activeAlert.lat, lng: activeAlert.lng }
@@ -224,7 +230,7 @@ const UserDashboard = () => {
                   {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Siren className="h-4 w-4 mr-2" />}
                   Dispatch alert
                 </Button>
-                <p className="text-xs text-muted-foreground text-center">1-hour cooldown enforced between alerts.</p>
+                <p className="text-xs text-muted-foreground text-center">20-minute cooldown enforced between active alerts.</p>
               </>
             ) : (
               <div className="space-y-3">
@@ -245,6 +251,9 @@ const UserDashboard = () => {
                 {activeAlert.user_marked_solved && (
                   <p className="text-sm text-success">Waiting for responder to confirm…</p>
                 )}
+                <Button onClick={() => discardAlert(activeAlert.id)} variant="outline" className="w-full">
+                  <XCircle className="h-4 w-4 mr-2" /> Discard alert
+                </Button>
               </div>
             )}
           </CardContent>

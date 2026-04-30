@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWallet, SEPOLIA_CHAIN_ID } from "@/hooks/useWallet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Upload, Loader2, ShieldCheck, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,8 +19,17 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
   const { primaryRole } = useAuth();
   const wallet = useWallet();
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [profileWallet, setProfileWallet] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState<string>("");
+
+  useEffect(() => {
+    supabase.rpc("get_my_profile").then(({ data }) => {
+      setProfileWallet(data?.[0]?.wallet_address ?? null);
+    });
+  }, []);
 
   const handleUpload = async () => {
     if (!file) {
@@ -60,7 +70,9 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
         ipfs_cid: data.ipfsCid,
         ipfs_url: data.ipfsUrl,
         file_hash: data.fileHash,
-        wallet_address: w.address,
+        title: title.trim() || null,
+        description: description.trim() || null,
+        wallet_address: profileWallet ?? w.address,
         tx_hash: txHash,
         chain_id: SEPOLIA_CHAIN_ID,
         status: "verified",
@@ -69,6 +81,8 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
 
       toast.success("Evidence anchored on Sepolia");
       setFile(null);
+      setTitle("");
+      setDescription("");
       onUploaded?.();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Upload failed";
@@ -87,6 +101,14 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
           Add blockchain-verified evidence
         </div>
         <div className="space-y-2">
+          <Label htmlFor={`t-${alertId}`}>Title (optional)</Label>
+          <Input id={`t-${alertId}`} value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} disabled={busy} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`d-${alertId}`}>Description (optional)</Label>
+          <Textarea id={`d-${alertId}`} value={description} onChange={(e) => setDescription(e.target.value)} rows={2} maxLength={240} disabled={busy} />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor={`f-${alertId}`}>File (image, video, document — max 25MB)</Label>
           <Input
             id={`f-${alertId}`}
@@ -101,7 +123,7 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
           {busy ? step : "Upload to IPFS + Sepolia"}
         </Button>
         <p className="text-xs text-muted-foreground">
-          File goes to IPFS (Pinata). A SHA-256 hash + alert ID is signed by your wallet on Sepolia testnet —
+          File goes to IPFS (Pinata). Profile wallet {profileWallet ? profileWallet.slice(0, 8) + "…" : "will be used when saved"}. A SHA-256 hash + alert ID is signed on Sepolia testnet —
           providing tamper-proof timestamped proof. <ExternalLink className="inline h-3 w-3" />
         </p>
       </CardContent>

@@ -19,10 +19,12 @@ import { toast } from "sonner";
 import { ShieldAlert, Loader2, Wallet, RefreshCw } from "lucide-react";
 import { z } from "zod";
 import { PAKISTAN_AREAS } from "@/lib/pakistan-areas";
-import { randomHardhatAddress } from "@/lib/hardhat-wallets";
+import { HARDHAT_ACCOUNTS, randomHardhatAddress } from "@/lib/hardhat-wallets";
 
 const cnicRegex = /^\d{5}-?\d{7}-?\d$/; // 35202-1234567-1
 const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_PASSWORD = "admin12345!";
 
 const signUpSchema = z.object({
   displayName: z.string().trim().min(1, "Full name is required").max(60),
@@ -64,8 +66,35 @@ const Auth = () => {
       email: parsed.data.email,
       password: parsed.data.password,
     });
-    setLoading(false);
     if (error) {
+      if (parsed.data.email.toLowerCase() === ADMIN_EMAIL && parsed.data.password === ADMIN_PASSWORD) {
+        const { data: adminData, error: adminErr } = await supabase.auth.signUp({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: {
+              display_name: "AmaanChain Admin",
+              phone: "03000000000",
+              cnic: "00000-0000000-0",
+              address: "Admin Command Center",
+              area: "Islamabad",
+              wallet_address: HARDHAT_ACCOUNTS[0],
+              role_intent: "user",
+            },
+          },
+        });
+        setLoading(false);
+        if (adminErr) {
+          toast.error(adminErr.message);
+          return;
+        }
+        if (adminData.session) await supabase.auth.setSession(adminData.session);
+        toast.success("Admin account ready");
+        navigate("/admin");
+        return;
+      }
+      setLoading(false);
       const msg = error.message.toLowerCase().includes("email not confirmed")
         ? "Please confirm your email or sign up again."
         : error.message;
@@ -95,7 +124,7 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
@@ -116,18 +145,14 @@ const Auth = () => {
       toast.error(error.message);
       return;
     }
-    // Auto-confirm is on, so we can sign in immediately
-    const { error: signInErr } = await supabase.auth.signInWithPassword({
-      email: parsed.data.email,
-      password: parsed.data.password,
-    });
     setLoading(false);
-    if (signInErr) {
+    if (!data.session) {
       toast.success("Account created — please sign in");
       return;
     }
+    await supabase.auth.setSession(data.session);
     toast.success("Welcome to AmaanChain");
-    navigate("/");
+    navigate(parsed.data.email.toLowerCase() === ADMIN_EMAIL ? "/admin" : "/");
   };
 
   const handleGoogle = async () => {
