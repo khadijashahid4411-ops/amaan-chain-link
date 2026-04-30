@@ -13,7 +13,7 @@ import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { toast } from "sonner";
-import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star } from "lucide-react";
+import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { z } from "zod";
 
@@ -124,6 +124,12 @@ const UserDashboard = () => {
   const ratingFor = async (id: string, stars: number) => {
     await supabase.from("alerts").update({ rating: stars }).eq("id", id);
     toast.success("Thanks for the rating");
+  };
+
+  const discardAlert = async (id: string) => {
+    const { error } = await supabase.from("alerts").update({ status: "cancelled" }).eq("id", id);
+    if (error) toast.error(error.message);
+    else toast.success("Alert discarded");
   };
 
   const activeAlert = alerts.find((a) => ["pending", "accepted", "in_progress"].includes(a.status));
