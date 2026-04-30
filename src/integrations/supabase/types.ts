@@ -14,16 +14,263 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          accepted_at: string | null
+          address: string | null
+          assigned_responder_id: string | null
+          created_at: string
+          description: string
+          id: string
+          lat: number
+          lng: number
+          priority: Database["public"]["Enums"]["alert_priority"]
+          rating: number | null
+          rating_comment: string | null
+          responder_marked_solved: boolean
+          solved_at: string | null
+          status: Database["public"]["Enums"]["alert_status"]
+          updated_at: string
+          user_id: string
+          user_marked_solved: boolean
+        }
+        Insert: {
+          accepted_at?: string | null
+          address?: string | null
+          assigned_responder_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          lat: number
+          lng: number
+          priority?: Database["public"]["Enums"]["alert_priority"]
+          rating?: number | null
+          rating_comment?: string | null
+          responder_marked_solved?: boolean
+          solved_at?: string | null
+          status?: Database["public"]["Enums"]["alert_status"]
+          updated_at?: string
+          user_id: string
+          user_marked_solved?: boolean
+        }
+        Update: {
+          accepted_at?: string | null
+          address?: string | null
+          assigned_responder_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          lat?: number
+          lng?: number
+          priority?: Database["public"]["Enums"]["alert_priority"]
+          rating?: number | null
+          rating_comment?: string | null
+          responder_marked_solved?: boolean
+          solved_at?: string | null
+          status?: Database["public"]["Enums"]["alert_status"]
+          updated_at?: string
+          user_id?: string
+          user_marked_solved?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_assigned_responder_id_fkey"
+            columns: ["assigned_responder_id"]
+            isOneToOne: false
+            referencedRelation: "responders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence: {
+        Row: {
+          alert_id: string
+          chain_id: number | null
+          created_at: string
+          file_hash: string
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          ipfs_cid: string
+          ipfs_url: string
+          status: Database["public"]["Enums"]["evidence_status"]
+          tx_hash: string | null
+          updated_at: string
+          uploaded_by: string
+          uploader_role: Database["public"]["Enums"]["app_role"]
+          wallet_address: string | null
+        }
+        Insert: {
+          alert_id: string
+          chain_id?: number | null
+          created_at?: string
+          file_hash: string
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          ipfs_cid: string
+          ipfs_url: string
+          status?: Database["public"]["Enums"]["evidence_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          uploaded_by: string
+          uploader_role: Database["public"]["Enums"]["app_role"]
+          wallet_address?: string | null
+        }
+        Update: {
+          alert_id?: string
+          chain_id?: number | null
+          created_at?: string
+          file_hash?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          ipfs_cid?: string
+          ipfs_url?: string
+          status?: Database["public"]["Enums"]["evidence_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          uploaded_by?: string
+          uploader_role?: Database["public"]["Enums"]["app_role"]
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+          wallet_address: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          wallet_address?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      responders: {
+        Row: {
+          created_at: string
+          current_lat: number | null
+          current_lng: number | null
+          id: string
+          is_active: boolean
+          location_updated_at: string | null
+          rating: number
+          specialty: string | null
+          status: Database["public"]["Enums"]["responder_status"]
+          total_responses: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          id?: string
+          is_active?: boolean
+          location_updated_at?: string | null
+          rating?: number
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["responder_status"]
+          total_responses?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          id?: string
+          is_active?: boolean
+          location_updated_at?: string | null
+          rating?: number
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["responder_status"]
+          total_responses?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      alert_priority: "low" | "medium" | "high" | "critical"
+      alert_status:
+        | "pending"
+        | "accepted"
+        | "in_progress"
+        | "solved"
+        | "rejected"
+        | "cancelled"
+      app_role: "user" | "responder" | "admin"
+      evidence_status: "pending" | "verified" | "failed"
+      responder_status: "pending" | "approved" | "rejected" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +397,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      alert_priority: ["low", "medium", "high", "critical"],
+      alert_status: [
+        "pending",
+        "accepted",
+        "in_progress",
+        "solved",
+        "rejected",
+        "cancelled",
+      ],
+      app_role: ["user", "responder", "admin"],
+      evidence_status: ["pending", "verified", "failed"],
+      responder_status: ["pending", "approved", "rejected", "suspended"],
+    },
   },
 } as const
