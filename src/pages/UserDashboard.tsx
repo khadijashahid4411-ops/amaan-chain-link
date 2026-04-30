@@ -230,7 +230,7 @@ const UserDashboard = () => {
                   {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Siren className="h-4 w-4 mr-2" />}
                   Dispatch alert
                 </Button>
-                <p className="text-xs text-muted-foreground text-center">1-hour cooldown enforced between alerts.</p>
+                <p className="text-xs text-muted-foreground text-center">20-minute cooldown enforced between active alerts.</p>
               </>
             ) : (
               <div className="space-y-3">
@@ -251,6 +251,9 @@ const UserDashboard = () => {
                 {activeAlert.user_marked_solved && (
                   <p className="text-sm text-success">Waiting for responder to confirm…</p>
                 )}
+                <Button onClick={() => discardAlert(activeAlert.id)} variant="outline" className="w-full">
+                  <XCircle className="h-4 w-4 mr-2" /> Discard alert
+                </Button>
               </div>
             )}
           </CardContent>
