@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
+import { BecomeResponder } from "@/components/BecomeResponder";
 import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -167,6 +168,8 @@ const UserDashboard = () => {
         <h1 className="text-2xl md:text-3xl font-bold">Emergency Console</h1>
         <p className="text-muted-foreground">Send alerts and track responders in real time.</p>
       </header>
+
+      <BecomeResponder />
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Alert form / active alert */}
