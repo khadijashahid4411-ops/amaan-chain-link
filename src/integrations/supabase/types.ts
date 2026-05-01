@@ -231,6 +231,9 @@ export type Database = {
           is_active: boolean
           location_updated_at: string | null
           rating: number
+          rejection_reason: string | null
+          request_message: string | null
+          reviewed_at: string | null
           specialty: string | null
           status: Database["public"]["Enums"]["responder_status"]
           total_responses: number
@@ -245,6 +248,9 @@ export type Database = {
           is_active?: boolean
           location_updated_at?: string | null
           rating?: number
+          rejection_reason?: string | null
+          request_message?: string | null
+          reviewed_at?: string | null
           specialty?: string | null
           status?: Database["public"]["Enums"]["responder_status"]
           total_responses?: number
@@ -259,6 +265,9 @@ export type Database = {
           is_active?: boolean
           location_updated_at?: string | null
           rating?: number
+          rejection_reason?: string | null
+          request_message?: string | null
+          reviewed_at?: string | null
           specialty?: string | null
           status?: Database["public"]["Enums"]["responder_status"]
           total_responses?: number
