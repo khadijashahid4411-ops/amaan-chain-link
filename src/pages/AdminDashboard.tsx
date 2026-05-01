@@ -58,15 +58,33 @@ const AdminDashboard = () => {
     };
   }, []);
 
-  const setResponderStatus = async (id: string, userId: string, status: "approved" | "rejected" | "suspended") => {
-    const { error } = await supabase.from("responders").update({ status }).eq("id", id);
+  const setResponderStatus = async (
+    id: string,
+    userId: string,
+    status: "approved" | "rejected" | "suspended"
+  ) => {
+    let rejection_reason: string | null = null;
+    if (status === "rejected") {
+      const reason = window.prompt("Reason for rejection (shown to the user):", "");
+      if (reason === null) return;
+      rejection_reason = reason.trim() || "No reason provided";
+    }
+    const { error } = await supabase
+      .from("responders")
+      .update({
+        status,
+        rejection_reason,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
     }
     if (status === "approved") {
-      // grant responder role
-      const { error: rErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "responder" });
+      const { error: rErr } = await supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: "responder" });
       if (rErr && !rErr.message.includes("duplicate")) toast.error(rErr.message);
     } else {
       await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "responder");
@@ -125,10 +143,17 @@ const AdminDashboard = () => {
         <StatCard icon={Users} label="Approved responders" value={stats.responders} accent="accent" />
       </div>
 
-      <Tabs defaultValue="alerts">
+      <Tabs defaultValue={stats.pendingResponders > 0 ? "responders" : "alerts"}>
         <TabsList className="grid grid-cols-4 md:w-fit">
           <TabsTrigger value="alerts"><Siren className="h-4 w-4 mr-1" />Alerts</TabsTrigger>
-          <TabsTrigger value="responders"><Users className="h-4 w-4 mr-1" />Responders</TabsTrigger>
+          <TabsTrigger value="responders" className="relative">
+            <Users className="h-4 w-4 mr-1" />Responders
+            {stats.pendingResponders > 0 && (
+              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-[10px] font-bold text-warning-foreground">
+                {stats.pendingResponders}
+              </span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="evidence"><FileCheck2 className="h-4 w-4 mr-1" />Evidence</TabsTrigger>
           <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1" />Analytics</TabsTrigger>
         </TabsList>
@@ -169,43 +194,81 @@ const AdminDashboard = () => {
 
         <TabsContent value="responders" className="space-y-4">
           {stats.pendingResponders > 0 && (
-            <Card className="border-warning">
+            <Card className="border-warning bg-warning/5">
               <CardHeader>
-                <CardTitle>Pending applications ({stats.pendingResponders})</CardTitle>
-                <CardDescription>Approve to grant responder role.</CardDescription>
+                <CardTitle className="text-warning-foreground">
+                  🔔 {stats.pendingResponders} pending responder request{stats.pendingResponders > 1 ? "s" : ""}
+                </CardTitle>
+                <CardDescription>Review the applicant's details and approve or reject with a reason.</CardDescription>
               </CardHeader>
             </Card>
           )}
-          {responders.map((r) => (
-            <Card key={r.id}>
-              <CardContent className="pt-6 flex items-center justify-between gap-2 flex-wrap">
-                <div>
-                  <div className="font-medium">{profiles[r.user_id]?.display_name ?? "Responder"}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {r.specialty ?? "—"} • Rating {r.rating}★ • {r.total_responses} responses
-                  </div>
-                  <Badge className="mt-1 capitalize">{r.status}</Badge>
-                </div>
-                <div className="flex gap-2">
-                  {r.status !== "approved" && (
-                    <Button size="sm" onClick={() => setResponderStatus(r.id, r.user_id, "approved")}>
-                      <CheckCircle2 className="h-4 w-4 mr-1" />Approve
-                    </Button>
-                  )}
-                  {r.status !== "rejected" && (
-                    <Button size="sm" variant="outline" onClick={() => setResponderStatus(r.id, r.user_id, "rejected")}>
-                      <XCircle className="h-4 w-4 mr-1" />Reject
-                    </Button>
-                  )}
-                  {r.status === "approved" && (
-                    <Button size="sm" variant="ghost" onClick={() => setResponderStatus(r.id, r.user_id, "suspended")}>
-                      Suspend
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {[...responders]
+            .sort((a, b) => (a.status === "pending" ? -1 : b.status === "pending" ? 1 : 0))
+            .map((r) => {
+              const p = profiles[r.user_id];
+              return (
+                <Card key={r.id} className={r.status === "pending" ? "border-warning" : ""}>
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="min-w-0 space-y-1">
+                        <div className="font-medium">{p?.display_name ?? "Responder"}</div>
+                        <div className="text-xs text-muted-foreground space-y-0.5">
+                          {p?.phone && <div>📞 {p.phone}</div>}
+                          {p?.cnic && <div>🪪 {p.cnic}</div>}
+                          {p?.area && <div>📍 {p.area}{p.address ? ` — ${p.address}` : ""}</div>}
+                          {p?.wallet_address && (
+                            <div className="font-mono truncate max-w-xs">💼 {p.wallet_address}</div>
+                          )}
+                          <div>
+                            {r.specialty ? `Specialty: ${r.specialty}` : "No specialty"} • Rating {r.rating}★ •{" "}
+                            {r.total_responses} responses
+                          </div>
+                        </div>
+                        <Badge className="capitalize">{r.status}</Badge>
+                      </div>
+                      <div className="flex gap-2">
+                        {r.status !== "approved" && (
+                          <Button size="sm" onClick={() => setResponderStatus(r.id, r.user_id, "approved")}>
+                            <CheckCircle2 className="h-4 w-4 mr-1" />Approve
+                          </Button>
+                        )}
+                        {r.status !== "rejected" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setResponderStatus(r.id, r.user_id, "rejected")}
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />Reject
+                          </Button>
+                        )}
+                        {r.status === "approved" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setResponderStatus(r.id, r.user_id, "suspended")}
+                          >
+                            Suspend
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    {r.request_message && (
+                      <div className="rounded-md border bg-muted/30 p-3 text-sm">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Applicant message</div>
+                        "{r.request_message}"
+                      </div>
+                    )}
+                    {r.status === "rejected" && r.rejection_reason && (
+                      <div className="text-xs text-destructive">Rejection reason: {r.rejection_reason}</div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          {responders.length === 0 && (
+            <p className="text-sm text-muted-foreground">No responder applications yet.</p>
+          )}
         </TabsContent>
 
         <TabsContent value="evidence" className="space-y-2">
