@@ -58,15 +58,33 @@ const AdminDashboard = () => {
     };
   }, []);
 
-  const setResponderStatus = async (id: string, userId: string, status: "approved" | "rejected" | "suspended") => {
-    const { error } = await supabase.from("responders").update({ status }).eq("id", id);
+  const setResponderStatus = async (
+    id: string,
+    userId: string,
+    status: "approved" | "rejected" | "suspended"
+  ) => {
+    let rejection_reason: string | null = null;
+    if (status === "rejected") {
+      const reason = window.prompt("Reason for rejection (shown to the user):", "");
+      if (reason === null) return;
+      rejection_reason = reason.trim() || "No reason provided";
+    }
+    const { error } = await supabase
+      .from("responders")
+      .update({
+        status,
+        rejection_reason,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
     }
     if (status === "approved") {
-      // grant responder role
-      const { error: rErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "responder" });
+      const { error: rErr } = await supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: "responder" });
       if (rErr && !rErr.message.includes("duplicate")) toast.error(rErr.message);
     } else {
       await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "responder");
