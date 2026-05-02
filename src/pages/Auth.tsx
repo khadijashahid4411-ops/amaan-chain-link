@@ -102,7 +102,7 @@ const Auth = () => {
       return;
     }
     toast.success("Welcome back");
-    navigate("/");
+    navigate(parsed.data.email.toLowerCase() === ADMIN_EMAIL ? "/admin" : "/");
   };
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
