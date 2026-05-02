@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.enforce_responder_role_approval() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.sync_responder_role_on_status_change() FROM PUBLIC, anon, authenticated;
