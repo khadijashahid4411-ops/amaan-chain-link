@@ -50,6 +50,20 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
 import { cn } from "@/lib/utils";
+import { AlertFilters } from "@/components/AlertFilters";
+import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
 type Responder = Database["public"]["Tables"]["responders"]["Row"];
@@ -103,6 +117,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedAlert, setSelectedAlert] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [alertFilters, setAlertFilters] = useState<AlertFilterState>(emptyFilters);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const load = async () => {
     const [a, r, p, e] = await Promise.all([
