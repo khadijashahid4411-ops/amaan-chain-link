@@ -112,6 +112,60 @@ export type Database = {
           },
         ]
       }
+      complaints: {
+        Row: {
+          action_taken: string | null
+          admin_notes: string | null
+          alert_id: string | null
+          category: string
+          complainant_id: string
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["complaint_kind"]
+          message: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["complaint_status"]
+          target_responder_id: string | null
+          target_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: string | null
+          admin_notes?: string | null
+          alert_id?: string | null
+          category: string
+          complainant_id: string
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["complaint_kind"]
+          message: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["complaint_status"]
+          target_responder_id?: string | null
+          target_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: string | null
+          admin_notes?: string | null
+          alert_id?: string | null
+          category?: string
+          complainant_id?: string
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["complaint_kind"]
+          message?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["complaint_status"]
+          target_responder_id?: string | null
+          target_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       evidence: {
         Row: {
           alert_id: string
@@ -308,6 +362,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_purge_user_data: {
+        Args: { _target_user: string }
+        Returns: undefined
+      }
       auto_redispatch_alerts: { Args: never; Returns: undefined }
       ensure_account_setup: {
         Args: {
@@ -368,6 +426,8 @@ export type Database = {
         | "rejected"
         | "cancelled"
       app_role: "user" | "responder" | "admin"
+      complaint_kind: "user_against_responder" | "admin_against_user"
+      complaint_status: "open" | "reviewing" | "resolved" | "dismissed"
       evidence_status: "pending" | "verified" | "failed"
       responder_status: "pending" | "approved" | "rejected" | "suspended"
     }
@@ -507,6 +567,8 @@ export const Constants = {
         "cancelled",
       ],
       app_role: ["user", "responder", "admin"],
+      complaint_kind: ["user_against_responder", "admin_against_user"],
+      complaint_status: ["open", "reviewing", "resolved", "dismissed"],
       evidence_status: ["pending", "verified", "failed"],
       responder_status: ["pending", "approved", "rejected", "suspended"],
     },
