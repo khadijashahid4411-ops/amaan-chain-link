@@ -16,6 +16,7 @@ import {
   User,
   MessageSquareWarning,
   Map as MapIcon,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +61,8 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     { to: "/", icon: LayoutDashboard, label: "My Alerts", show: true },
     { to: "/responder", icon: Siren, label: "Responder", show: roles.includes("responder") },
     { to: "/admin", icon: ShieldCheck, label: "Admin", show: roles.includes("admin") },
+    { to: "/complaints", icon: MessageSquareWarning, label: "Complaints", show: true },
+    { to: "/profile", icon: UserCog, label: "Profile", show: true },
     { to: "/install", icon: Smartphone, label: "Install App", show: true },
   ];
 

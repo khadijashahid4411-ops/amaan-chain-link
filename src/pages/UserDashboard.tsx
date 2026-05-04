@@ -13,6 +13,7 @@ import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { BecomeResponder } from "@/components/BecomeResponder";
+import { ComplaintForm } from "@/components/ComplaintForm";
 import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -259,6 +260,13 @@ const UserDashboard = () => {
                 <Button onClick={() => discardAlert(activeAlert.id)} variant="outline" className="w-full">
                   <XCircle className="h-4 w-4 mr-2" /> Discard alert
                 </Button>
+                {activeAlert.assigned_responder_id && responders[activeAlert.assigned_responder_id] && (
+                  <ComplaintForm
+                    responder={responders[activeAlert.assigned_responder_id]}
+                    alertId={activeAlert.id}
+                    triggerLabel="Report this responder"
+                  />
+                )}
               </div>
             )}
           </CardContent>

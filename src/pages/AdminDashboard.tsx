@@ -50,6 +50,20 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
 import { cn } from "@/lib/utils";
+import { AlertFilters } from "@/components/AlertFilters";
+import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
 type Responder = Database["public"]["Tables"]["responders"]["Row"];
@@ -103,6 +117,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedAlert, setSelectedAlert] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [alertFilters, setAlertFilters] = useState<AlertFilterState>(emptyFilters);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const load = async () => {
     const [a, r, p, e] = await Promise.all([
@@ -133,6 +149,22 @@ const AdminDashboard = () => {
       supabase.removeChannel(ch);
     };
   }, []);
+
+  const deleteUser = async (targetId: string) => {
+    setDeletingUserId(targetId);
+    const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+      body: { target_user_id: targetId },
+    });
+    setDeletingUserId(null);
+    if (error || (data as any)?.error) {
+      toast.error(error?.message ?? (data as any)?.error ?? "Delete failed");
+    } else {
+      toast.success("User account deleted");
+      load();
+    }
+  };
+
+  const areaLookup = (uid: string) => profiles[uid]?.area;
 
   const stats = useMemo(() => {
     const totalUsers = Object.keys(profiles).length;
@@ -420,9 +452,16 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const AlertsSection = () => (
+  const AlertsSection = () => {
+    const filtered = filterAlerts(alerts, alertFilters, areaLookup);
+    return (
     <Card>
-      <CardHeader><CardTitle>All alerts ({alerts.length})</CardTitle></CardHeader>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <CardTitle>All alerts ({filtered.length}{filtered.length !== alerts.length && ` of ${alerts.length}`})</CardTitle>
+          <AlertFilters value={alertFilters} onChange={setAlertFilters} />
+        </div>
+      </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
@@ -436,7 +475,7 @@ const AdminDashboard = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {alerts.map((a) => (
+            {filtered.map((a) => (
               <TableRow key={a.id}>
                 <TableCell><Badge className={STATUS_COLORS[a.status]}>{a.status.replace("_", " ")}</Badge></TableCell>
                 <TableCell className="capitalize">{a.priority}</TableCell>
@@ -450,14 +489,15 @@ const AdminDashboard = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {alerts.length === 0 && (
-              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No alerts.</TableCell></TableRow>
+            {filtered.length === 0 && (
+              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No alerts match the filters.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   const AlertDetailsSection = () => {
     if (!detailedAlert) {
@@ -622,6 +662,7 @@ const AdminDashboard = () => {
               <TableHead>Area</TableHead>
               <TableHead>Wallet</TableHead>
               <TableHead>Role intent</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -633,10 +674,33 @@ const AdminDashboard = () => {
                 <TableCell className="text-xs">{p.area ?? "—"}</TableCell>
                 <TableCell className="text-xs font-mono truncate max-w-[160px]">{p.wallet_address ?? "—"}</TableCell>
                 <TableCell><Badge variant="outline" className="capitalize">{p.role_intent ?? "user"}</Badge></TableCell>
+                <TableCell>
+                  {p.user_id !== user?.id && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={deletingUserId === p.user_id}>
+                          {deletingUserId === p.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete {p.display_name ?? "user"}?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Permanently removes the account, profile, roles, responder record, evidence, and active alerts. This cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteUser(p.user_id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
             {filteredUsers.length === 0 && (
-              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No users.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground">No users.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>

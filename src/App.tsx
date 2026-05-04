@@ -11,6 +11,8 @@ import Auth from "./pages/Auth.tsx";
 import ResponderDashboard from "./pages/ResponderDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import Install from "./pages/Install.tsx";
+import Profile from "./pages/Profile.tsx";
+import Complaints from "./pages/Complaints.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Shell><Install /></Shell>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/complaints"
+              element={
+                <ProtectedRoute>
+                  <Complaints />
                 </ProtectedRoute>
               }
             />
