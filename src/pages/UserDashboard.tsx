@@ -163,15 +163,17 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
-      <header>
+    <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 scroll-smooth">
+      <header id="home" className="scroll-mt-6">
         <h1 className="text-2xl md:text-3xl font-bold">Emergency Console</h1>
         <p className="text-muted-foreground">Send alerts and track responders in real time.</p>
       </header>
 
-      <BecomeResponder />
+      <section id="complaints" className="scroll-mt-6">
+        <BecomeResponder />
+      </section>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div id="active" className="grid lg:grid-cols-2 gap-6 scroll-mt-6">
         {/* Alert form / active alert */}
         <Card className={activeAlert ? "border-primary shadow-emergency" : ""}>
           <CardHeader>
@@ -263,7 +265,7 @@ const UserDashboard = () => {
         </Card>
 
         {/* Map */}
-        <Card>
+        <Card id="map" className="scroll-mt-6">
           <CardHeader className="pb-2">
             <CardTitle>Live map</CardTitle>
           </CardHeader>
@@ -276,9 +278,9 @@ const UserDashboard = () => {
       </div>
 
       {/* History */}
-      <Card>
+      <Card id="history" className="scroll-mt-6">
         <CardHeader>
-          <CardTitle>Alert history</CardTitle>
+          <CardTitle id="evidence">Alert history & evidence</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {alerts.length === 0 && <p className="text-sm text-muted-foreground">No alerts yet.</p>}
