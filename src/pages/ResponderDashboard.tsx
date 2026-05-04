@@ -42,6 +42,7 @@ const ResponderDashboard = () => {
   const [rejectedAlertIds, setRejectedAlertIds] = useState<Set<string>>(new Set());
   const [registering, setRegistering] = useState(false);
   const [specialty, setSpecialty] = useState("");
+  const [filters, setFilters] = useState<AlertFilterState>(emptyFilters);
 
   // Load responder profile
   useEffect(() => {
@@ -204,13 +205,14 @@ const ResponderDashboard = () => {
     );
   }
 
-  // Filter pending alerts within radius
-  const pending = alerts.filter((a) => {
+  // Filter pending alerts within radius, then apply user filters
+  const pendingBase = alerts.filter((a) => {
     if (a.status !== "pending") return false;
     if (rejectedAlertIds.has(a.id)) return false;
     if (!coords) return true;
     return distKm(coords, { lat: a.lat, lng: a.lng }) <= RADIUS_KM;
   });
+  const pending = filterAlerts(pendingBase, filters);
 
   const myActive = alerts.filter((a) => a.assigned_responder_id === responder.id && a.status !== "solved");
 
@@ -294,8 +296,11 @@ const ResponderDashboard = () => {
 
       {/* Pending */}
       <section id="pending" className="space-y-3 scroll-mt-6">
-        <h2 id="evidence" className="text-lg font-semibold">Nearby pending alerts ({pending.length})</h2>
-        {pending.length === 0 && <p className="text-sm text-muted-foreground">No pending alerts within {RADIUS_KM} km.</p>}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <h2 id="evidence" className="text-lg font-semibold">Nearby pending alerts ({pending.length})</h2>
+          <AlertFilters value={filters} onChange={setFilters} showArea={false} />
+        </div>
+        {pending.length === 0 && <p className="text-sm text-muted-foreground">No pending alerts within {RADIUS_KM} km matching filters.</p>}
         {pending.map((a) => (
           <Card key={a.id}>
             <CardContent className="pt-6 space-y-3">
