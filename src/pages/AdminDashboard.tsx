@@ -150,6 +150,22 @@ const AdminDashboard = () => {
     };
   }, []);
 
+  const deleteUser = async (targetId: string) => {
+    setDeletingUserId(targetId);
+    const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+      body: { target_user_id: targetId },
+    });
+    setDeletingUserId(null);
+    if (error || (data as any)?.error) {
+      toast.error(error?.message ?? (data as any)?.error ?? "Delete failed");
+    } else {
+      toast.success("User account deleted");
+      load();
+    }
+  };
+
+  const areaLookup = (uid: string) => profiles[uid]?.area;
+
   const stats = useMemo(() => {
     const totalUsers = Object.keys(profiles).length;
     return {
