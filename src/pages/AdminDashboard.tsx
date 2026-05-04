@@ -452,9 +452,16 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const AlertsSection = () => (
+  const AlertsSection = () => {
+    const filtered = filterAlerts(alerts, alertFilters, areaLookup);
+    return (
     <Card>
-      <CardHeader><CardTitle>All alerts ({alerts.length})</CardTitle></CardHeader>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <CardTitle>All alerts ({filtered.length}{filtered.length !== alerts.length && ` of ${alerts.length}`})</CardTitle>
+          <AlertFilters value={alertFilters} onChange={setAlertFilters} />
+        </div>
+      </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
@@ -468,7 +475,7 @@ const AdminDashboard = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {alerts.map((a) => (
+            {filtered.map((a) => (
               <TableRow key={a.id}>
                 <TableCell><Badge className={STATUS_COLORS[a.status]}>{a.status.replace("_", " ")}</Badge></TableCell>
                 <TableCell className="capitalize">{a.priority}</TableCell>
