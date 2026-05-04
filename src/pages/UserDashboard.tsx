@@ -13,6 +13,7 @@ import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { BecomeResponder } from "@/components/BecomeResponder";
+import { ComplaintForm } from "@/components/ComplaintForm";
 import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
