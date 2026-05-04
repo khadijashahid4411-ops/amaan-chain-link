@@ -662,6 +662,7 @@ const AdminDashboard = () => {
               <TableHead>Area</TableHead>
               <TableHead>Wallet</TableHead>
               <TableHead>Role intent</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -673,10 +674,33 @@ const AdminDashboard = () => {
                 <TableCell className="text-xs">{p.area ?? "—"}</TableCell>
                 <TableCell className="text-xs font-mono truncate max-w-[160px]">{p.wallet_address ?? "—"}</TableCell>
                 <TableCell><Badge variant="outline" className="capitalize">{p.role_intent ?? "user"}</Badge></TableCell>
+                <TableCell>
+                  {p.user_id !== user?.id && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={deletingUserId === p.user_id}>
+                          {deletingUserId === p.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete {p.display_name ?? "user"}?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Permanently removes the account, profile, roles, responder record, evidence, and active alerts. This cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteUser(p.user_id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
             {filteredUsers.length === 0 && (
-              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No users.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground">No users.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
