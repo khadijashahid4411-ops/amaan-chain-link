@@ -45,7 +45,9 @@ export type Database = {
           assigned_responder_id: string | null
           created_at: string
           description: string
+          dispatch_attempts: number
           id: string
+          last_dispatched_at: string
           lat: number
           lng: number
           priority: Database["public"]["Enums"]["alert_priority"]
@@ -64,7 +66,9 @@ export type Database = {
           assigned_responder_id?: string | null
           created_at?: string
           description: string
+          dispatch_attempts?: number
           id?: string
+          last_dispatched_at?: string
           lat: number
           lng: number
           priority?: Database["public"]["Enums"]["alert_priority"]
@@ -83,7 +87,9 @@ export type Database = {
           assigned_responder_id?: string | null
           created_at?: string
           description?: string
+          dispatch_attempts?: number
           id?: string
+          last_dispatched_at?: string
           lat?: number
           lng?: number
           priority?: Database["public"]["Enums"]["alert_priority"]
@@ -302,6 +308,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_redispatch_alerts: { Args: never; Returns: undefined }
       ensure_account_setup: {
         Args: {
           _address?: string

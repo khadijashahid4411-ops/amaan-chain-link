@@ -226,8 +226,8 @@ const ResponderDashboard = () => {
   );
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 scroll-smooth">
+      <header id="home" className="flex flex-wrap items-center justify-between gap-4 scroll-mt-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
             <Siren className="h-7 w-7 text-primary" /> Responder Dashboard
@@ -240,7 +240,7 @@ const ResponderDashboard = () => {
         </div>
       </header>
 
-      <Card>
+      <Card id="map" className="scroll-mt-6">
         <CardHeader className="pb-2"><CardTitle>Map</CardTitle></CardHeader>
         <CardContent>
           <div className="h-72 rounded-lg overflow-hidden">
@@ -251,7 +251,7 @@ const ResponderDashboard = () => {
 
       {/* My active */}
       {myActive.length > 0 && (
-        <section className="space-y-3">
+        <section id="active" className="space-y-3 scroll-mt-6">
           <h2 className="text-lg font-semibold">Your active responses</h2>
           {myActive.map((a) => (
             <Card key={a.id} className="border-accent">
@@ -291,8 +291,8 @@ const ResponderDashboard = () => {
       )}
 
       {/* Pending */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Nearby pending alerts ({pending.length})</h2>
+      <section id="pending" className="space-y-3 scroll-mt-6">
+        <h2 id="evidence" className="text-lg font-semibold">Nearby pending alerts ({pending.length})</h2>
         {pending.length === 0 && <p className="text-sm text-muted-foreground">No pending alerts within {RADIUS_KM} km.</p>}
         {pending.map((a) => (
           <Card key={a.id}>
