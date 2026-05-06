@@ -11,7 +11,7 @@ import { Upload, Loader2, ShieldCheck, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface Props {
-  alertId: string;
+  alertId?: string | null;
   onUploaded?: () => void;
 }
 
@@ -55,13 +55,13 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
 
       // 3. Anchor hash on-chain
       setStep("Confirming blockchain transaction…");
-      const txHash = await wallet.anchorEvidence(w.signer, data.fileHash, alertId);
+      const txHash = await wallet.anchorEvidence(w.signer, data.fileHash, alertId ?? "standalone");
 
       // 4. Save to database
       setStep("Saving record…");
       const { data: userData } = await supabase.auth.getUser();
       const { error: insErr } = await supabase.from("evidence").insert({
-        alert_id: alertId,
+        alert_id: alertId ?? null,
         uploaded_by: userData.user!.id,
         uploader_role: primaryRole,
         file_name: data.fileName,

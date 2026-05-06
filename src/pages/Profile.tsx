@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AppShell } from "@/components/AppShell";
+import { BackButton } from "@/components/BackButton";
 import { toast } from "sonner";
 import { Loader2, Save, User as UserIcon } from "lucide-react";
 import { PAKISTAN_AREAS } from "@/lib/pakistan-areas";
@@ -95,6 +96,7 @@ const Profile = () => {
   return (
     <AppShell>
       <div className="p-4 md:p-8 max-w-3xl mx-auto space-y-6">
+        <BackButton />
         <header className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">

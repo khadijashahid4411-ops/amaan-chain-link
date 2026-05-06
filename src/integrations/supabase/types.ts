@@ -168,7 +168,7 @@ export type Database = {
       }
       evidence: {
         Row: {
-          alert_id: string
+          alert_id: string | null
           chain_id: number | null
           created_at: string
           description: string | null
@@ -188,7 +188,7 @@ export type Database = {
           wallet_address: string | null
         }
         Insert: {
-          alert_id: string
+          alert_id?: string | null
           chain_id?: number | null
           created_at?: string
           description?: string | null
@@ -208,7 +208,7 @@ export type Database = {
           wallet_address?: string | null
         }
         Update: {
-          alert_id?: string
+          alert_id?: string | null
           chain_id?: number | null
           created_at?: string
           description?: string | null
