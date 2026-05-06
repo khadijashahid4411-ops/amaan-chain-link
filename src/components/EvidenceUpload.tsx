@@ -61,7 +61,7 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
       setStep("Saving record…");
       const { data: userData } = await supabase.auth.getUser();
       const { error: insErr } = await supabase.from("evidence").insert({
-        alert_id: alertId,
+        alert_id: alertId ?? null,
         uploaded_by: userData.user!.id,
         uploader_role: primaryRole,
         file_name: data.fileName,
