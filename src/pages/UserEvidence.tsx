@@ -9,6 +9,7 @@ import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { FileImage, Plus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { BackButton } from "@/components/BackButton";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
 
