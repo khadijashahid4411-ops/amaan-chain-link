@@ -1,8 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Apple, Chrome } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const Install = () => (
   <div className="p-4 md:p-8 max-w-2xl mx-auto space-y-4">
+    <BackButton />
     <header>
       <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
         <Smartphone className="h-7 w-7 text-primary" /> Install AmaanChain
