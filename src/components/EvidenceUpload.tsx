@@ -11,7 +11,7 @@ import { Upload, Loader2, ShieldCheck, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface Props {
-  alertId: string;
+  alertId?: string | null;
   onUploaded?: () => void;
 }
 
