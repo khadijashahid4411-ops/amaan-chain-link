@@ -19,6 +19,7 @@ const ResponderEvidence = () => {
   const [responder, setResponder] = useState<Responder | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [showStandalone, setShowStandalone] = useState(false);
 
   useEffect(() => {
     if (!user) return;
