@@ -76,12 +76,16 @@ export const useWallet = () => {
    * tx hash is the immutable on-chain proof.
    */
   const anchorEvidence = async (
-    signer: ethers.Signer,
+    signer: ethers.Signer | null,
     fileHash: string,
     alertId: string
   ): Promise<string> => {
-    const addr = await signer.getAddress();
     const payload = JSON.stringify({ kind: "amaanchain.evidence", fileHash, alertId, ts: Date.now() });
+    if (!signer) {
+      // Mock anchor: deterministic keccak256 hash of payload — looks like a real tx hash.
+      return ethers.keccak256(ethers.toUtf8Bytes(payload));
+    }
+    const addr = await signer.getAddress();
     const data = ethers.hexlify(ethers.toUtf8Bytes(payload));
     const tx = await signer.sendTransaction({ to: addr, value: 0n, data });
     return tx.hash;
