@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AppShell } from "@/components/AppShell";
+import { BackButton } from "@/components/BackButton";
 import { toast } from "sonner";
 import { Loader2, Save, User as UserIcon } from "lucide-react";
 import { PAKISTAN_AREAS } from "@/lib/pakistan-areas";
