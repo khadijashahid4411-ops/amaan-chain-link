@@ -55,7 +55,7 @@ export const EvidenceUpload = ({ alertId, onUploaded }: Props) => {
 
       // 3. Anchor hash on-chain
       setStep("Confirming blockchain transaction…");
-      const txHash = await wallet.anchorEvidence(w.signer, data.fileHash, alertId);
+      const txHash = await wallet.anchorEvidence(w.signer, data.fileHash, alertId ?? "standalone");
 
       // 4. Save to database
       setStep("Saving record…");
