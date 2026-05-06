@@ -15,8 +15,9 @@ import { EvidenceList } from "@/components/EvidenceList";
 import { BecomeResponder } from "@/components/BecomeResponder";
 import { ComplaintForm } from "@/components/ComplaintForm";
 import { toast } from "sonner";
-import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle } from "lucide-react";
+import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle, Navigation } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { haversineKm, estimateEtaMinutes } from "@/lib/eta";
 import { z } from "zod";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
