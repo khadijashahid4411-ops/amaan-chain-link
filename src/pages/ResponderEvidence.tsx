@@ -67,19 +67,44 @@ const ResponderEvidence = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+      <BackButton />
       <header>
         <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
           <FileImage className="h-7 w-7 text-primary" /> Responder Evidence
         </h1>
         <p className="text-muted-foreground">
-          Upload tamper-proof evidence for alerts you've handled.
+          Upload tamper-proof evidence for alerts you've handled — or independently as a field report.
         </p>
       </header>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between gap-2 flex-wrap">
+            <div>
+              <CardTitle className="text-base">Independent field report</CardTitle>
+              <CardDescription>Anchor evidence not linked to any specific alert.</CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant={showStandalone ? "secondary" : "default"}
+              onClick={() => setShowStandalone((s) => !s)}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              {showStandalone ? "Close" : "New upload"}
+            </Button>
+          </div>
+        </CardHeader>
+        {showStandalone && (
+          <CardContent>
+            <EvidenceUpload alertId={null} onUploaded={() => setShowStandalone(false)} />
+          </CardContent>
+        )}
+      </Card>
 
       {alerts.length === 0 && (
         <Card>
           <CardContent className="py-10 text-center text-muted-foreground">
-            You haven't accepted any alerts yet.
+            You haven't accepted any alerts yet. Use the independent uploader above to anchor field evidence.
           </CardContent>
         </Card>
       )}
