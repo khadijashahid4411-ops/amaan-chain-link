@@ -96,6 +96,7 @@ const Profile = () => {
   return (
     <AppShell>
       <div className="p-4 md:p-8 max-w-3xl mx-auto space-y-6">
+        <BackButton />
         <header className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
