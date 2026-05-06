@@ -245,11 +245,29 @@ const UserDashboard = () => {
                   {activeAlert.status.replace("_", " ").toUpperCase()}
                 </Badge>
                 <p className="text-sm">{activeAlert.description}</p>
-                {activeAlert.assigned_responder_id && responders[activeAlert.assigned_responder_id] && (
-                  <div className="text-sm text-muted-foreground">
-                    Responder en route • Rating {responders[activeAlert.assigned_responder_id].rating}★
-                  </div>
-                )}
+                {activeAlert.assigned_responder_id && responders[activeAlert.assigned_responder_id] && (() => {
+                  const r = responders[activeAlert.assigned_responder_id];
+                  const hasLoc = r.current_lat != null && r.current_lng != null;
+                  const km = hasLoc
+                    ? haversineKm({ lat: r.current_lat!, lng: r.current_lng! }, { lat: activeAlert.lat, lng: activeAlert.lng })
+                    : null;
+                  const eta = km != null ? estimateEtaMinutes(km) : null;
+                  return (
+                    <div className="rounded-md border border-success/40 bg-success/10 p-3 text-sm space-y-1">
+                      <div className="flex items-center gap-2 font-medium text-success">
+                        <Navigation className="h-4 w-4" /> Responder en route
+                      </div>
+                      <div className="text-muted-foreground">Rating {r.rating}★ • {r.total_responses} responses</div>
+                      {km != null ? (
+                        <div className="text-foreground">
+                          {km.toFixed(1)} km away • ETA ~{eta} min
+                        </div>
+                      ) : (
+                        <div className="text-muted-foreground text-xs">Waiting for live location…</div>
+                      )}
+                    </div>
+                  );
+                })()}
                 {!activeAlert.user_marked_solved && activeAlert.status === "in_progress" && (
                   <Button onClick={() => markSolved(activeAlert.id)} variant="outline" className="w-full">
                     <CheckCircle2 className="h-4 w-4 mr-2" /> Mark as solved
