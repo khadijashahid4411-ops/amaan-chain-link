@@ -17,10 +17,17 @@ export const useWallet = () => {
   const [chainId, setChainId] = useState<number | null>(null);
   const [connecting, setConnecting] = useState(false);
 
-  const connect = async (): Promise<{ address: string; signer: ethers.Signer } | null> => {
+  const connect = async (): Promise<{ address: string; signer: ethers.Signer | null; mock?: boolean } | null> => {
     if (!window.ethereum) {
-      toast.error("MetaMask not detected. Install it from metamask.io");
-      return null;
+      // Fallback: no MetaMask — use a deterministic mock wallet so demo still works.
+      const seed = (localStorage.getItem("amaan.mockWallet") ?? crypto.randomUUID());
+      localStorage.setItem("amaan.mockWallet", seed);
+      const wallet = ethers.Wallet.createRandom();
+      const addr = wallet.address;
+      setAddress(addr);
+      setChainId(SEPOLIA_CHAIN_ID);
+      toast.info("Using demo wallet (MetaMask not detected)");
+      return { address: addr, signer: null, mock: true };
     }
     try {
       setConnecting(true);
