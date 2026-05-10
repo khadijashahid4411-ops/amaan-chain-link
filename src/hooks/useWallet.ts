@@ -17,17 +17,10 @@ export const useWallet = () => {
   const [chainId, setChainId] = useState<number | null>(null);
   const [connecting, setConnecting] = useState(false);
 
-  const connect = async (): Promise<{ address: string; signer: ethers.Signer | null; mock?: boolean } | null> => {
+  const connect = async (): Promise<{ address: string; signer: ethers.Signer } | null> => {
     if (!window.ethereum) {
-      // Fallback: no MetaMask — use a deterministic mock wallet so demo still works.
-      const seed = (localStorage.getItem("amaan.mockWallet") ?? crypto.randomUUID());
-      localStorage.setItem("amaan.mockWallet", seed);
-      const wallet = ethers.Wallet.createRandom();
-      const addr = wallet.address;
-      setAddress(addr);
-      setChainId(SEPOLIA_CHAIN_ID);
-      toast.info("Using demo wallet (MetaMask not detected)");
-      return { address: addr, signer: null, mock: true };
+      toast.error("MetaMask not detected. Install it from metamask.io");
+      return null;
     }
     try {
       setConnecting(true);
@@ -76,16 +69,12 @@ export const useWallet = () => {
    * tx hash is the immutable on-chain proof.
    */
   const anchorEvidence = async (
-    signer: ethers.Signer | null,
+    signer: ethers.Signer,
     fileHash: string,
     alertId: string
   ): Promise<string> => {
-    const payload = JSON.stringify({ kind: "amaanchain.evidence", fileHash, alertId, ts: Date.now() });
-    if (!signer) {
-      // Mock anchor: deterministic keccak256 hash of payload — looks like a real tx hash.
-      return ethers.keccak256(ethers.toUtf8Bytes(payload));
-    }
     const addr = await signer.getAddress();
+    const payload = JSON.stringify({ kind: "amaanchain.evidence", fileHash, alertId, ts: Date.now() });
     const data = ethers.hexlify(ethers.toUtf8Bytes(payload));
     const tx = await signer.sendTransaction({ to: addr, value: 0n, data });
     return tx.hash;
