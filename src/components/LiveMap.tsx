@@ -106,5 +106,29 @@ export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerCl
     };
   }, [markers, onMarkerClick]);
 
+  // Sync polyline route
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!route || route.length < 2) {
+      if (polylineRef.current) {
+        polylineRef.current.setMap(null);
+        polylineRef.current = null;
+      }
+      return;
+    }
+    if (!polylineRef.current) {
+      polylineRef.current = new google.maps.Polyline({
+        map: mapRef.current,
+        path: route,
+        geodesic: true,
+        strokeColor: "#0ea5e9",
+        strokeOpacity: 0.9,
+        strokeWeight: 4,
+      });
+    } else {
+      polylineRef.current.setPath(route);
+    }
+  }, [route]);
+
   return <div ref={ref} className={className ?? "h-full w-full rounded-xl overflow-hidden"} />;
 };
