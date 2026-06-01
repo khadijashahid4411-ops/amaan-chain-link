@@ -141,6 +141,7 @@ const UserDashboard = () => {
     : coords ?? { lat: 24.8607, lng: 67.0011 }; // fallback Karachi
 
   const markers: MapMarkerSpec[] = [];
+  const route: { lat: number; lng: number }[] = [];
   if (coords) markers.push({ id: "you", lat: coords.lat, lng: coords.lng, color: "accent", title: "You" });
   if (activeAlert) {
     markers.push({
@@ -160,6 +161,9 @@ const UserDashboard = () => {
           color: "success",
           title: "Responder",
         });
+        // Draw ETA route from responder → emergency location
+        route.push({ lat: r.current_lat, lng: r.current_lng });
+        route.push({ lat: activeAlert.lat, lng: activeAlert.lng });
       }
     }
   }
@@ -298,7 +302,7 @@ const UserDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-80 rounded-lg overflow-hidden">
-              <LiveMap center={center} markers={markers} />
+              <LiveMap center={center} markers={markers} route={route} />
             </div>
           </CardContent>
         </Card>

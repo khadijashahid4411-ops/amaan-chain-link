@@ -16,6 +16,8 @@ interface Props {
   markers?: MapMarkerSpec[];
   className?: string;
   onMarkerClick?: (id: string) => void;
+  /** Optional polyline path drawn in order (e.g. responder → emergency). */
+  route?: { lat: number; lng: number }[];
 }
 
 const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
@@ -25,10 +27,11 @@ const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
   warning: "#eab308",
 };
 
-export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick }: Props) => {
+export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRefs = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
+  const polylineRef = useRef<google.maps.Polyline | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -102,6 +105,30 @@ export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerCl
       cancelled = true;
     };
   }, [markers, onMarkerClick]);
+
+  // Sync polyline route
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!route || route.length < 2) {
+      if (polylineRef.current) {
+        polylineRef.current.setMap(null);
+        polylineRef.current = null;
+      }
+      return;
+    }
+    if (!polylineRef.current) {
+      polylineRef.current = new google.maps.Polyline({
+        map: mapRef.current,
+        path: route,
+        geodesic: true,
+        strokeColor: "#0ea5e9",
+        strokeOpacity: 0.9,
+        strokeWeight: 4,
+      });
+    } else {
+      polylineRef.current.setPath(route);
+    }
+  }, [route]);
 
   return <div ref={ref} className={className ?? "h-full w-full rounded-xl overflow-hidden"} />;
 };
