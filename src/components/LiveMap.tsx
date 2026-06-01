@@ -16,6 +16,8 @@ interface Props {
   markers?: MapMarkerSpec[];
   className?: string;
   onMarkerClick?: (id: string) => void;
+  /** Optional polyline path drawn in order (e.g. responder → emergency). */
+  route?: { lat: number; lng: number }[];
 }
 
 const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
