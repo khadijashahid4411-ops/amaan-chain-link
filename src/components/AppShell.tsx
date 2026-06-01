@@ -34,12 +34,6 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     { to: "/", icon: LayoutDashboard, label: "My Alerts", show: true },
     { to: "/responder", icon: Siren, label: "Responder", show: isResponder },
     { to: "/admin", icon: ShieldCheck, label: "Admin", show: isAdmin },
-    {
-      to: isResponder ? "/responder/evidence" : "/evidence",
-      icon: FileImage,
-      label: "Evidence",
-      show: true,
-    },
     { to: "/complaints", icon: MessageSquareWarning, label: "Complaints", show: true },
     { to: "/profile", icon: UserCog, label: "Profile", show: true },
     { to: "/install", icon: Smartphone, label: "Install App", show: true },
