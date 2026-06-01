@@ -302,7 +302,7 @@ const UserDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-80 rounded-lg overflow-hidden">
-              <LiveMap center={center} markers={markers} />
+              <LiveMap center={center} markers={markers} route={route} />
             </div>
           </CardContent>
         </Card>
