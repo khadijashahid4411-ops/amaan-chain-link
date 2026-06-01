@@ -542,6 +542,25 @@ const AdminDashboard = () => {
     }
     const p = profiles[detailedAlert.user_id];
     const ev = evidence.filter((e) => e.alert_id === detailedAlert.id);
+    const assignedResp = detailedAlert.assigned_responder_id
+      ? responders.find((r) => r.id === detailedAlert.assigned_responder_id)
+      : null;
+    const respProfile = assignedResp ? profiles[assignedResp.user_id] : null;
+    const mapMarkers: MapMarkerSpec[] = [
+      { id: detailedAlert.id, lat: detailedAlert.lat, lng: detailedAlert.lng, color: "primary", title: detailedAlert.description },
+    ];
+    const mapRoute: { lat: number; lng: number }[] = [];
+    if (assignedResp?.current_lat && assignedResp?.current_lng) {
+      mapMarkers.push({
+        id: assignedResp.id,
+        lat: assignedResp.current_lat,
+        lng: assignedResp.current_lng,
+        color: "success",
+        title: respProfile?.display_name ?? "Responder",
+      });
+      mapRoute.push({ lat: assignedResp.current_lat, lng: assignedResp.current_lng });
+      mapRoute.push({ lat: detailedAlert.lat, lng: detailedAlert.lng });
+    }
     return (
       <div className="space-y-4">
         <Button variant="ghost" size="sm" onClick={() => setSelectedAlert(null)}>← Back to list</Button>
@@ -570,10 +589,33 @@ const AdminDashboard = () => {
                 <p className="text-xs text-muted-foreground">{detailedAlert.address ?? "—"}</p>
               </div>
             </div>
+            <div className="rounded-md border p-3 bg-muted/30">
+              <div className="text-xs text-muted-foreground mb-1">Assigned responder</div>
+              {assignedResp ? (
+                <div className="text-sm space-y-0.5">
+                  <div className="font-medium">{respProfile?.display_name ?? "Responder"} {respProfile?.phone ? `• ${respProfile.phone}` : ""}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {assignedResp.specialty ?? "—"} • overall rating {assignedResp.rating}★ • {assignedResp.total_responses} responses
+                  </div>
+                  {detailedAlert.accepted_at && (
+                    <div className="text-xs text-muted-foreground">Accepted {new Date(detailedAlert.accepted_at).toLocaleString()}</div>
+                  )}
+                  {detailedAlert.rating != null && (
+                    <div className="text-sm text-warning">User rated this response: {"★".repeat(detailedAlert.rating)}{"☆".repeat(5 - detailedAlert.rating)} ({detailedAlert.rating}/5)</div>
+                  )}
+                  {detailedAlert.rating_comment && (
+                    <div className="text-xs italic text-muted-foreground">"{detailedAlert.rating_comment}"</div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No responder has accepted this alert yet.</p>
+              )}
+            </div>
             <div className="h-64 rounded-lg overflow-hidden">
               <LiveMap
                 center={{ lat: detailedAlert.lat, lng: detailedAlert.lng }}
-                markers={[{ id: detailedAlert.id, lat: detailedAlert.lat, lng: detailedAlert.lng, color: "primary", title: detailedAlert.description }]}
+                markers={mapMarkers}
+                route={mapRoute}
               />
             </div>
             <div>
