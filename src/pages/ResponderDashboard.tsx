@@ -286,6 +286,15 @@ const ResponderDashboard = () => {
                     </Button>
                   )}
                 </div>
+                <div className="flex flex-wrap gap-2">
+                  <ComplaintAgainstUser
+                    targetUserId={a.user_id}
+                    alertId={a.id}
+                    filerKind="responder"
+                    triggerLabel="Report this user"
+                    small
+                  />
+                </div>
                 <EvidenceList alertId={a.id} />
                 <EvidenceUpload alertId={a.id} />
               </CardContent>
