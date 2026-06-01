@@ -73,10 +73,13 @@ export const useWallet = () => {
     fileHash: string,
     alertId: string
   ): Promise<string> => {
-    const addr = await signer.getAddress();
+    // Burn address — MetaMask blocks tx-to-self with data ("External transactions
+    // to internal accounts cannot include data"). Sending to 0x...dEaD keeps the
+    // payload, sender, and timestamp permanently anchored on Sepolia.
+    const BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD";
     const payload = JSON.stringify({ kind: "amaanchain.evidence", fileHash, alertId, ts: Date.now() });
     const data = ethers.hexlify(ethers.toUtf8Bytes(payload));
-    const tx = await signer.sendTransaction({ to: addr, value: 0n, data });
+    const tx = await signer.sendTransaction({ to: BURN_ADDRESS, value: 0n, data });
     return tx.hash;
   };
 
