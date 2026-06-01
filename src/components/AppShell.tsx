@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   LogOut,
   Smartphone,
-  FileImage,
   MessageSquareWarning,
   UserCog,
 } from "lucide-react";
