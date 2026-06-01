@@ -27,10 +27,11 @@ const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
   warning: "#eab308",
 };
 
-export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick }: Props) => {
+export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRefs = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
+  const polylineRef = useRef<google.maps.Polyline | null>(null);
 
   // Initialize map
   useEffect(() => {
