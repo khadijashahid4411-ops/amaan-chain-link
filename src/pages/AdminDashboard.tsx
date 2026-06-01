@@ -827,34 +827,75 @@ const AdminDashboard = () => {
     </Card>
   );
 
-  const SettingsSection = () => (
-    <Card>
-      <CardHeader><CardTitle>Settings</CardTitle><CardDescription>Platform configuration</CardDescription></CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div className="flex items-center justify-between border-b pb-2">
-          <div>
-            <div className="font-medium">Auto-approve email signups</div>
-            <div className="text-xs text-muted-foreground">Currently enabled for fast onboarding.</div>
+  const SettingsSection = () => {
+    const [cooldown, setCooldown] = useState<number>(20);
+    const [savingCd, setSavingCd] = useState(false);
+    useEffect(() => {
+      supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "alert_cooldown_minutes")
+        .maybeSingle()
+        .then(({ data }) => {
+          const v = (data as { value: unknown } | null)?.value;
+          if (typeof v === "number") setCooldown(v);
+          else if (typeof v === "string") setCooldown(Number(v) || 20);
+        });
+    }, []);
+    const saveCooldown = async () => {
+      const n = Math.max(0, Math.min(720, Math.round(cooldown)));
+      setSavingCd(true);
+      const { error } = await supabase
+        .from("app_settings")
+        .upsert({ key: "alert_cooldown_minutes", value: n, updated_by: user?.id, updated_at: new Date().toISOString() });
+      setSavingCd(false);
+      if (error) toast.error(error.message);
+      else toast.success(`Alert cooldown set to ${n} minutes`);
+    };
+    return (
+      <Card>
+        <CardHeader><CardTitle>Settings</CardTitle><CardDescription>Platform configuration</CardDescription></CardHeader>
+        <CardContent className="space-y-4 text-sm">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div>
+              <div className="font-medium">Auto-approve email signups</div>
+              <div className="text-xs text-muted-foreground">Currently enabled for fast onboarding.</div>
+            </div>
+            <Badge variant="outline">enabled</Badge>
           </div>
-          <Badge variant="outline">enabled</Badge>
-        </div>
-        <div className="flex items-center justify-between border-b pb-2">
-          <div>
-            <div className="font-medium">Alert cooldown</div>
-            <div className="text-xs text-muted-foreground">Users can only create one active alert per 20 minutes.</div>
+          <div className="border-b pb-3 space-y-2">
+            <div>
+              <div className="font-medium">Alert cooldown</div>
+              <div className="text-xs text-muted-foreground">
+                Minutes a user must wait between active alerts (0 disables the cooldown). Takes effect immediately for new alerts.
+              </div>
+            </div>
+            <div className="flex items-center gap-2 max-w-xs">
+              <Input
+                type="number"
+                min={0}
+                max={720}
+                value={cooldown}
+                onChange={(e) => setCooldown(Number(e.target.value))}
+              />
+              <span className="text-xs text-muted-foreground">min</span>
+              <Button size="sm" onClick={saveCooldown} disabled={savingCd}>
+                {savingCd && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                Save
+              </Button>
+            </div>
           </div>
-          <Badge variant="outline">20 min</Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="font-medium">Responder role guard</div>
-            <div className="text-xs text-muted-foreground">DB trigger blocks the responder role unless an approved application exists.</div>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-medium">Responder role guard</div>
+              <div className="text-xs text-muted-foreground">DB trigger blocks the responder role unless an approved application exists.</div>
+            </div>
+            <Badge variant="outline" className="border-success text-success">active</Badge>
           </div>
-          <Badge variant="outline" className="border-success text-success">active</Badge>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   const renderSection = () => {
     if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;

@@ -112,6 +112,27 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       complaints: {
         Row: {
           action_taken: string | null
@@ -426,7 +447,10 @@ export type Database = {
         | "rejected"
         | "cancelled"
       app_role: "user" | "responder" | "admin"
-      complaint_kind: "user_against_responder" | "admin_against_user"
+      complaint_kind:
+        | "user_against_responder"
+        | "admin_against_user"
+        | "responder_against_user"
       complaint_status: "open" | "reviewing" | "resolved" | "dismissed"
       evidence_status: "pending" | "verified" | "failed"
       responder_status: "pending" | "approved" | "rejected" | "suspended"
@@ -567,7 +591,11 @@ export const Constants = {
         "cancelled",
       ],
       app_role: ["user", "responder", "admin"],
-      complaint_kind: ["user_against_responder", "admin_against_user"],
+      complaint_kind: [
+        "user_against_responder",
+        "admin_against_user",
+        "responder_against_user",
+      ],
       complaint_status: ["open", "reviewing", "resolved", "dismissed"],
       evidence_status: ["pending", "verified", "failed"],
       responder_status: ["pending", "approved", "rejected", "suspended"],

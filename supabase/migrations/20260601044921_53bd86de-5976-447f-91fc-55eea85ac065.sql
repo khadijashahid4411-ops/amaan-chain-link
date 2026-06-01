@@ -1,0 +1,1 @@
+ALTER TYPE complaint_kind ADD VALUE IF NOT EXISTS 'responder_against_user';

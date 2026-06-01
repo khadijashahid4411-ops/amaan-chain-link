@@ -142,7 +142,12 @@ const Auth = () => {
     });
     if (error) {
       setLoading(false);
-      toast.error(error.message);
+      const m = error.message.toLowerCase();
+      if (m.includes("profiles_cnic_unique") || (m.includes("cnic") && m.includes("duplicate"))) {
+        toast.error("An account with this CNIC already exists. Only one account per CNIC is allowed.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     setLoading(false);
