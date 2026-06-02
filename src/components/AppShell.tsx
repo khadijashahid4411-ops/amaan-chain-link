@@ -12,6 +12,8 @@ import {
   Smartphone,
   MessageSquareWarning,
   UserCog,
+  FileImage,
+  ShieldPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
