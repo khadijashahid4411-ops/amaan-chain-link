@@ -1,17 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { MessageSquareWarning, Loader2 } from "lucide-react";
+import { MessageSquareWarning, Loader2, Search } from "lucide-react";
 import { z } from "zod";
 
 type Responder = Database["public"]["Tables"]["responders"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 const schema = z.object({
   category: z.enum(["misconduct", "negligence", "false_response", "rude_behavior", "other"]),
@@ -19,13 +29,11 @@ const schema = z.object({
 });
 
 interface Props {
-  /** Responder being reported. If omitted, user picks from approved responders. */
+  /** Responder being reported. If omitted, user picks from approved responders by name. */
   responder?: Responder;
   /** Optional alert this complaint relates to. */
   alertId?: string;
-  /** Optional override for the trigger button label. */
   triggerLabel?: string;
-  /** Render as a small ghost button (used inside cards). */
   small?: boolean;
 }
 
@@ -36,16 +44,45 @@ export const ComplaintForm = ({ responder, alertId, triggerLabel = "Report respo
   const [category, setCategory] = useState<z.infer<typeof schema>["category"]>("misconduct");
   const [message, setMessage] = useState("");
   const [responders, setResponders] = useState<Responder[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [search, setSearch] = useState("");
   const [chosenResponderId, setChosenResponderId] = useState<string | undefined>(responder?.id);
 
   useEffect(() => {
     if (!open || responder) return;
-    supabase
-      .from("responders")
-      .select("*")
-      .eq("status", "approved")
-      .then(({ data }) => setResponders(data ?? []));
-  }, [open, responder]);
+    (async () => {
+      const { data: rs } = await supabase
+        .from("responders")
+        .select("*")
+        .eq("status", "approved");
+      // Exclude self so a responder can't complain about themselves
+      const list = (rs ?? []).filter((r) => r.user_id !== user?.id);
+      setResponders(list);
+
+      const ids = list.map((r) => r.user_id);
+      if (ids.length) {
+        const { data: ps } = await supabase.from("profiles").select("*").in("user_id", ids);
+        const map: Record<string, Profile> = {};
+        (ps ?? []).forEach((p) => (map[p.user_id] = p));
+        setProfiles(map);
+      }
+    })();
+  }, [open, responder, user?.id]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return responders.slice(0, 50);
+    return responders
+      .filter((r) => {
+        const p = profiles[r.user_id];
+        return (
+          (p?.display_name ?? "").toLowerCase().includes(q) ||
+          (p?.phone ?? "").toLowerCase().includes(q) ||
+          (r.specialty ?? "").toLowerCase().includes(q)
+        );
+      })
+      .slice(0, 50);
+  }, [responders, profiles, search]);
 
   const submit = async () => {
     if (!user) return;
@@ -62,6 +99,10 @@ export const ComplaintForm = ({ responder, alertId, triggerLabel = "Report respo
     const target = responder ?? responders.find((r) => r.id === targetResponderId);
     if (!target) {
       toast.error("Responder not found");
+      return;
+    }
+    if (target.user_id === user.id) {
+      toast.error("You can't file a complaint against yourself");
       return;
     }
 
@@ -82,6 +123,7 @@ export const ComplaintForm = ({ responder, alertId, triggerLabel = "Report respo
       toast.success("Complaint submitted — admin will review it");
       setOpen(false);
       setMessage("");
+      setSearch("");
     }
   };
 
@@ -93,35 +135,63 @@ export const ComplaintForm = ({ responder, alertId, triggerLabel = "Report respo
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>File a complaint</DialogTitle>
           <DialogDescription>
-            Your report goes directly to admins. Please be accurate — false complaints may result in account action.
+            Your report goes directly to admins. Please be accurate — false complaints may result in
+            account action.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {!responder && (
             <div className="space-y-2">
-              <Label>Responder</Label>
-              <Select value={chosenResponderId} onValueChange={setChosenResponderId}>
-                <SelectTrigger><SelectValue placeholder="Select a responder" /></SelectTrigger>
-                <SelectContent>
-                  {responders.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>
-                      {r.specialty ?? "Responder"} • {r.rating}★
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Search responder by name, phone or specialty</Label>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Start typing a name…"
+                  className="pl-8"
+                />
+              </div>
+              <div className="max-h-48 overflow-y-auto rounded-md border divide-y">
+                {filtered.length === 0 && (
+                  <div className="p-3 text-xs text-muted-foreground">No matching responders.</div>
+                )}
+                {filtered.map((r) => {
+                  const p = profiles[r.user_id];
+                  return (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setChosenResponderId(r.id)}
+                      className={`w-full text-left p-2 text-sm hover:bg-muted/40 ${
+                        chosenResponderId === r.id ? "bg-accent/20" : ""
+                      }`}
+                    >
+                      <div className="font-medium">
+                        {p?.display_name ?? "Unnamed responder"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {r.specialty ?? "Responder"} • {r.rating}★
+                        {p?.phone ? ` • ${p.phone}` : ""}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
           <div className="space-y-2">
             <Label>Category</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="misconduct">Misconduct</SelectItem>
                 <SelectItem value="negligence">Negligence / no-show</SelectItem>
@@ -146,7 +216,9 @@ export const ComplaintForm = ({ responder, alertId, triggerLabel = "Report respo
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
           <Button onClick={submit} disabled={submitting}>
             {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             Submit complaint
