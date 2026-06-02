@@ -14,6 +14,7 @@ import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { AlertFilters } from "@/components/AlertFilters";
 import { ComplaintAgainstUser } from "@/components/ComplaintAgainstUser";
+import { ResponderStats } from "@/components/ResponderStats";
 import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
 import { toast } from "sonner";
 import { Siren, CheckCircle2, XCircle, Loader2, MapPin, Navigation } from "lucide-react";
