@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ComplaintForm } from "@/components/ComplaintForm";
+import { ComplaintAgainstUser } from "@/components/ComplaintAgainstUser";
 import { toast } from "sonner";
 import { MessageSquareWarning, Loader2, Trash2, ShieldCheck, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
