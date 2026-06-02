@@ -55,6 +55,7 @@ const STATUS_COLORS: Record<string, string> = {
 const Complaints = () => {
   const { user, roles } = useAuth();
   const isAdmin = roles.includes("admin");
+  const isResponder = roles.includes("responder");
   const [items, setItems] = useState<ComplaintRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { display_name: string | null; phone: string | null; area: string | null }>>({});
   const [loading, setLoading] = useState(true);
