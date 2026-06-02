@@ -246,6 +246,10 @@ const ResponderDashboard = () => {
         </div>
       </header>
 
+      <section id="stats" className="scroll-mt-6">
+        <ResponderStats responder={responder} />
+      </section>
+
       <Card id="map" className="scroll-mt-6">
         <CardHeader className="pb-2"><CardTitle>Map</CardTitle></CardHeader>
         <CardContent>
