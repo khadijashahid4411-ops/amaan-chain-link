@@ -29,7 +29,7 @@ import { formatDistanceToNow } from "date-fns";
 
 interface ComplaintRow {
   id: string;
-  kind: "user_against_responder" | "admin_against_user";
+  kind: "user_against_responder" | "admin_against_user" | "responder_against_user";
   complainant_id: string;
   target_user_id: string;
   target_responder_id: string | null;
