@@ -13,7 +13,7 @@ import {
   MessageSquareWarning,
   UserCog,
   FileImage,
-  ShieldPlus,
+  HandHelping,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
