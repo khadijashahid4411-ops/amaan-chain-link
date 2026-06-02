@@ -95,6 +95,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/become-responder"
+              element={
+                <ProtectedRoute>
+                  <Shell><BecomeResponderPage /></Shell>
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
