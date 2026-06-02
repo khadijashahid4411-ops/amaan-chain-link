@@ -15,6 +15,7 @@ import Profile from "./pages/Profile.tsx";
 import Complaints from "./pages/Complaints.tsx";
 import UserEvidence from "./pages/UserEvidence.tsx";
 import ResponderEvidence from "./pages/ResponderEvidence.tsx";
+import BecomeResponderPage from "./pages/BecomeResponderPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -91,6 +92,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Shell><ResponderEvidence /></Shell>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/become-responder"
+              element={
+                <ProtectedRoute>
+                  <Shell><BecomeResponderPage /></Shell>
                 </ProtectedRoute>
               }
             />

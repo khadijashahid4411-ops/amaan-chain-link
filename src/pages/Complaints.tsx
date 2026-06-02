@@ -22,13 +22,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ComplaintForm } from "@/components/ComplaintForm";
+import { ComplaintAgainstUser } from "@/components/ComplaintAgainstUser";
 import { toast } from "sonner";
 import { MessageSquareWarning, Loader2, Trash2, ShieldCheck, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface ComplaintRow {
   id: string;
-  kind: "user_against_responder" | "admin_against_user";
+  kind: "user_against_responder" | "admin_against_user" | "responder_against_user";
   complainant_id: string;
   target_user_id: string;
   target_responder_id: string | null;
@@ -54,6 +55,7 @@ const STATUS_COLORS: Record<string, string> = {
 const Complaints = () => {
   const { user, roles } = useAuth();
   const isAdmin = roles.includes("admin");
+  const isResponder = roles.includes("responder");
   const [items, setItems] = useState<ComplaintRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { display_name: string | null; phone: string | null; area: string | null }>>({});
   const [loading, setLoading] = useState(true);
@@ -109,7 +111,13 @@ const Complaints = () => {
               {isAdmin ? "Review user complaints and take action." : "File and track complaints about responders."}
             </p>
           </div>
-          {!isAdmin && <ComplaintForm triggerLabel="File a complaint" />}
+          {!isAdmin && (
+            isResponder ? (
+              <ComplaintAgainstUser filerKind="responder" triggerLabel="File complaint against user" />
+            ) : (
+              <ComplaintForm triggerLabel="File complaint against responder" />
+            )
+          )}
         </header>
 
         {loading ? (
@@ -277,7 +285,11 @@ const AdminComplaintCard = ({
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
             <CardTitle className="text-base">
-              {complaint.kind === "user_against_responder" ? "User → Responder" : "Admin → User"}
+              {complaint.kind === "user_against_responder"
+                ? "User → Responder"
+                : complaint.kind === "responder_against_user"
+                ? "Responder → User"
+                : "Admin → User"}
             </CardTitle>
             <CardDescription className="mt-1">
               By <strong>{complainantProfile?.display_name ?? "—"}</strong> against{" "}
