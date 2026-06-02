@@ -111,7 +111,13 @@ const Complaints = () => {
               {isAdmin ? "Review user complaints and take action." : "File and track complaints about responders."}
             </p>
           </div>
-          {!isAdmin && <ComplaintForm triggerLabel="File a complaint" />}
+          {!isAdmin && (
+            isResponder ? (
+              <ComplaintAgainstUser filerKind="responder" triggerLabel="File complaint against user" />
+            ) : (
+              <ComplaintForm triggerLabel="File complaint against responder" />
+            )
+          )}
         </header>
 
         {loading ? (
