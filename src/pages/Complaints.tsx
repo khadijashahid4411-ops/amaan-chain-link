@@ -285,7 +285,11 @@ const AdminComplaintCard = ({
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
             <CardTitle className="text-base">
-              {complaint.kind === "user_against_responder" ? "User → Responder" : "Admin → User"}
+              {complaint.kind === "user_against_responder"
+                ? "User → Responder"
+                : complaint.kind === "responder_against_user"
+                ? "Responder → User"
+                : "Admin → User"}
             </CardTitle>
             <CardDescription className="mt-1">
               By <strong>{complainantProfile?.display_name ?? "—"}</strong> against{" "}
