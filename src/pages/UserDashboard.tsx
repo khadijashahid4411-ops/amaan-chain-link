@@ -175,8 +175,8 @@ const UserDashboard = () => {
         <p className="text-muted-foreground">Send alerts and track responders in real time.</p>
       </header>
 
-      <section id="complaints" className="scroll-mt-6">
-        <BecomeResponder />
+      <section id="stats" className="scroll-mt-6">
+        <UserStats />
       </section>
 
       <div id="active" className="grid lg:grid-cols-2 gap-6 scroll-mt-6">
