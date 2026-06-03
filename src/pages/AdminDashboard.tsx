@@ -354,6 +354,20 @@ const AdminDashboard = () => {
           <span className="flex-1 text-left">Complaints</span>
         </button>
         <button
+          onClick={() => navigate("/evidence-guide")}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-smooth"
+        >
+          <FileCheck2 className="h-4 w-4" />
+          <span className="flex-1 text-left">Evidence Guide</span>
+        </button>
+        <button
+          onClick={() => navigate("/appearance")}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-smooth"
+        >
+          <Settings className="h-4 w-4" />
+          <span className="flex-1 text-left">Appearance</span>
+        </button>
+        <button
           onClick={() => navigate("/profile")}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-smooth"
         >
