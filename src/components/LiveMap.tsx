@@ -7,7 +7,7 @@ export interface MapMarkerSpec {
   lat: number;
   lng: number;
   title?: string;
-  color?: "primary" | "accent" | "success" | "warning";
+  color?: "primary" | "accent" | "success" | "warning" | "muted";
 }
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
   onMarkerClick?: (id: string) => void;
   /** Optional polyline path drawn in order (e.g. responder → emergency). */
   route?: { lat: number; lng: number }[];
+  /** Optional radius circle (km) centered on `circle.center`. */
+  circle?: { center: { lat: number; lng: number }; radiusKm: number; color?: string };
 }
 
 const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
@@ -25,13 +27,15 @@ const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
   accent: "#0ea5e9",
   success: "#16a34a",
   warning: "#eab308",
+  muted: "#94a3b8",
 };
 
-export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route }: Props) => {
+export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route, circle }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRefs = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const circleRef = useRef<google.maps.Circle | null>(null);
 
   // Initialize map
   useEffect(() => {
