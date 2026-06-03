@@ -335,8 +335,10 @@ const UserDashboard = () => {
         <Card id="map" className="scroll-mt-6">
           <CardHeader className="pb-2">
             <CardTitle>Live map</CardTitle>
+            <CardDescription>On-duty responders nearby are shown in green.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
+            <MapLegend />
             <div className="h-80 rounded-lg overflow-hidden">
               <LiveMap center={center} markers={markers} route={route} />
             </div>
