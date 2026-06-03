@@ -173,8 +173,8 @@ const UserDashboard = () => {
       id: "alert",
       lat: activeAlert.lat,
       lng: activeAlert.lng,
-      color: "primary",
-      title: "Emergency",
+      color: statusMarkerColor(activeAlert.status),
+      title: `Your alert — ${activeAlert.status.replace("_", " ")}`,
     });
     if (activeAlert.assigned_responder_id) {
       const r = responders[activeAlert.assigned_responder_id];
@@ -184,14 +184,25 @@ const UserDashboard = () => {
           lat: r.current_lat,
           lng: r.current_lng,
           color: "success",
-          title: "Responder",
+          title: "Assigned responder",
         });
-        // Draw ETA route from responder → emergency location
         route.push({ lat: r.current_lat, lng: r.current_lng });
         route.push({ lat: activeAlert.lat, lng: activeAlert.lng });
       }
     }
   }
+  // Show on-duty responders (excluding the one already assigned to avoid dup)
+  onDutyResponders.forEach((r) => {
+    if (activeAlert?.assigned_responder_id === r.id) return;
+    if (r.current_lat == null || r.current_lng == null) return;
+    markers.push({
+      id: `r-${r.id}`,
+      lat: r.current_lat,
+      lng: r.current_lng,
+      color: "success",
+      title: `On-duty responder${r.specialty ? ` • ${r.specialty}` : ""}`,
+    });
+  });
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 scroll-smooth">
