@@ -7,7 +7,7 @@ export interface MapMarkerSpec {
   lat: number;
   lng: number;
   title?: string;
-  color?: "primary" | "accent" | "success" | "warning";
+  color?: "primary" | "accent" | "success" | "warning" | "muted";
 }
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
   onMarkerClick?: (id: string) => void;
   /** Optional polyline path drawn in order (e.g. responder → emergency). */
   route?: { lat: number; lng: number }[];
+  /** Optional radius circle (km) centered on `circle.center`. */
+  circle?: { center: { lat: number; lng: number }; radiusKm: number; color?: string };
 }
 
 const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
@@ -25,13 +27,15 @@ const COLORS: Record<NonNullable<MapMarkerSpec["color"]>, string> = {
   accent: "#0ea5e9",
   success: "#16a34a",
   warning: "#eab308",
+  muted: "#94a3b8",
 };
 
-export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route }: Props) => {
+export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerClick, route, circle }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRefs = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const circleRef = useRef<google.maps.Circle | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -129,6 +133,32 @@ export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerCl
       polylineRef.current.setPath(route);
     }
   }, [route]);
+
+  // Sync radius circle
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!circle) {
+      if (circleRef.current) {
+        circleRef.current.setMap(null);
+        circleRef.current = null;
+      }
+      return;
+    }
+    const opts: google.maps.CircleOptions = {
+      center: circle.center,
+      radius: circle.radiusKm * 1000,
+      strokeColor: circle.color ?? "#0ea5e9",
+      strokeOpacity: 0.7,
+      strokeWeight: 2,
+      fillColor: circle.color ?? "#0ea5e9",
+      fillOpacity: 0.08,
+    };
+    if (!circleRef.current) {
+      circleRef.current = new google.maps.Circle({ map: mapRef.current, ...opts });
+    } else {
+      circleRef.current.setOptions(opts);
+    }
+  }, [circle?.center.lat, circle?.center.lng, circle?.radiusKm, circle?.color]);
 
   return <div ref={ref} className={className ?? "h-full w-full rounded-xl overflow-hidden"} />;
 };

@@ -14,6 +14,8 @@ import {
   UserCog,
   FileImage,
   HandHelping,
+  BookOpen,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,11 +38,14 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     { to: "/responder", icon: Siren, label: "Responder", show: isResponder },
     { to: "/admin", icon: ShieldCheck, label: "Admin", show: isAdmin },
     { to: isResponder ? "/responder/evidence" : "/evidence", icon: FileImage, label: "Upload Evidence", show: true },
+    { to: "/evidence-guide", icon: BookOpen, label: "Evidence Guide", show: true },
     { to: "/become-responder", icon: HandHelping, label: "Become Responder", show: !isResponder && !isAdmin },
     { to: "/complaints", icon: MessageSquareWarning, label: "Complaints", show: true },
     { to: "/profile", icon: UserCog, label: "Profile", show: true },
+    { to: "/appearance", icon: Palette, label: "Appearance", show: true },
     { to: "/install", icon: Smartphone, label: "Install App", show: true },
   ].filter((i) => i.show);
+
 
   const handleSignOut = async () => {
     await signOut();

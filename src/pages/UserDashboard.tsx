@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
+import { MapLegend } from "@/components/MapLegend";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { UserStats } from "@/components/UserStats";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle, Navigation } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { haversineKm, estimateEtaMinutes } from "@/lib/eta";
+import { statusMarkerColor } from "@/lib/alertColors";
 import { z } from "zod";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
@@ -42,6 +44,7 @@ const UserDashboard = () => {
   const { coords, error: geoErr, loading: geoLoading, retry: retryGeo } = useGeolocation();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [responders, setResponders] = useState<Record<string, Responder>>({});
+  const [onDutyResponders, setOnDutyResponders] = useState<Responder[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [priority, setPriority] = useState<"low" | "medium" | "high" | "critical">("high");
   const [description, setDescription] = useState("");
@@ -80,6 +83,28 @@ const UserDashboard = () => {
       supabase.removeChannel(ch);
     };
   }, [user]);
+
+  // Load on-duty responders for map visibility
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("responders")
+        .select("*")
+        .eq("status", "approved")
+        .eq("is_active", true)
+        .not("current_lat", "is", null)
+        .not("current_lng", "is", null);
+      setOnDutyResponders(data ?? []);
+    };
+    load();
+    const ch = supabase
+      .channel("on-duty-responders")
+      .on("postgres_changes", { event: "*", schema: "public", table: "responders" }, load)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
 
   const submit = async () => {
     if (!coords) {
@@ -148,8 +173,8 @@ const UserDashboard = () => {
       id: "alert",
       lat: activeAlert.lat,
       lng: activeAlert.lng,
-      color: "primary",
-      title: "Emergency",
+      color: statusMarkerColor(activeAlert.status),
+      title: `Your alert — ${activeAlert.status.replace("_", " ")}`,
     });
     if (activeAlert.assigned_responder_id) {
       const r = responders[activeAlert.assigned_responder_id];
@@ -159,14 +184,25 @@ const UserDashboard = () => {
           lat: r.current_lat,
           lng: r.current_lng,
           color: "success",
-          title: "Responder",
+          title: "Assigned responder",
         });
-        // Draw ETA route from responder → emergency location
         route.push({ lat: r.current_lat, lng: r.current_lng });
         route.push({ lat: activeAlert.lat, lng: activeAlert.lng });
       }
     }
   }
+  // Show on-duty responders (excluding the one already assigned to avoid dup)
+  onDutyResponders.forEach((r) => {
+    if (activeAlert?.assigned_responder_id === r.id) return;
+    if (r.current_lat == null || r.current_lng == null) return;
+    markers.push({
+      id: `r-${r.id}`,
+      lat: r.current_lat,
+      lng: r.current_lng,
+      color: "success",
+      title: `On-duty responder${r.specialty ? ` • ${r.specialty}` : ""}`,
+    });
+  });
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 scroll-smooth">
@@ -299,8 +335,10 @@ const UserDashboard = () => {
         <Card id="map" className="scroll-mt-6">
           <CardHeader className="pb-2">
             <CardTitle>Live map</CardTitle>
+            <CardDescription>On-duty responders nearby are shown in green.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
+            <MapLegend />
             <div className="h-80 rounded-lg overflow-hidden">
               <LiveMap center={center} markers={markers} route={route} />
             </div>

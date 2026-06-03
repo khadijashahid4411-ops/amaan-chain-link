@@ -10,12 +10,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
+import { MapLegend } from "@/components/MapLegend";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { AlertFilters } from "@/components/AlertFilters";
 import { ComplaintAgainstUser } from "@/components/ComplaintAgainstUser";
 import { ResponderStats } from "@/components/ResponderStats";
 import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
+import { statusMarkerColor } from "@/lib/alertColors";
 import { toast } from "sonner";
 import { Siren, CheckCircle2, XCircle, Loader2, MapPin, Navigation } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -223,12 +225,24 @@ const ResponderDashboard = () => {
     : coords ?? { lat: 24.8607, lng: 67.0011 };
 
   const markers: MapMarkerSpec[] = [];
-  if (coords) markers.push({ id: "me", lat: coords.lat, lng: coords.lng, color: "success", title: "You" });
+  if (coords) markers.push({ id: "me", lat: coords.lat, lng: coords.lng, color: "success", title: "You (on duty)" });
   pending.forEach((a) =>
-    markers.push({ id: a.id, lat: a.lat, lng: a.lng, color: "primary", title: a.description.slice(0, 40) })
+    markers.push({
+      id: a.id,
+      lat: a.lat,
+      lng: a.lng,
+      color: statusMarkerColor(a.status),
+      title: `Pending • ${a.description.slice(0, 40)}`,
+    })
   );
   myActive.forEach((a) =>
-    markers.push({ id: a.id, lat: a.lat, lng: a.lng, color: "accent", title: "Active" })
+    markers.push({
+      id: a.id,
+      lat: a.lat,
+      lng: a.lng,
+      color: statusMarkerColor(a.status),
+      title: `${a.status.replace("_", " ")} • ${a.description.slice(0, 40)}`,
+    })
   );
 
   return (
@@ -251,10 +265,18 @@ const ResponderDashboard = () => {
       </section>
 
       <Card id="map" className="scroll-mt-6">
-        <CardHeader className="pb-2"><CardTitle>Map</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-72 rounded-lg overflow-hidden">
-            <LiveMap center={center} markers={markers} />
+        <CardHeader className="pb-2">
+          <CardTitle>Map — {RADIUS_KM} km coverage</CardTitle>
+          <CardDescription>The shaded circle is your dispatch radius. Pending alerts inside it appear below.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <MapLegend />
+          <div className="h-80 rounded-lg overflow-hidden">
+            <LiveMap
+              center={center}
+              markers={markers}
+              circle={coords ? { center: coords, radiusKm: RADIUS_KM, color: "#16a34a" } : undefined}
+            />
           </div>
         </CardContent>
       </Card>
