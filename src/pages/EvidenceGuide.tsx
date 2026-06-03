@@ -69,7 +69,7 @@ const UploadFlow = ({ role }: { role: "user" | "responder" | "admin" }) => {
         <Step n={2} title="Pick your file">
           <p>Choose any image, short video, or PDF. Max size <strong>25 MB</strong>. Add a short title and description so others know what it shows.</p>
         </Step>
-        <Step n={3} title="Click "Upload to IPFS + Sepolia"">
+        <Step n={3} title={'Click "Upload to IPFS + Sepolia"'}>
           <p>The app will:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Send the file to <strong>IPFS</strong> (decentralised storage). It can never be silently changed.</li>
