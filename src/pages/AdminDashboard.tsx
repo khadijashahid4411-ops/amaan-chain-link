@@ -992,6 +992,7 @@ const AdminDashboard = () => {
     if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
     switch (section) {
       case "home": return <HomeSection />;
+      case "live-monitor": return <LiveMonitorSection />;
       case "analytics": return <AnalyticsSection />;
       case "alerts": return <AlertsSection />;
       case "alert-details": return <AlertDetailsSection />;
@@ -1007,6 +1008,7 @@ const AdminDashboard = () => {
 
   const titleMap: Record<SectionId, string> = {
     home: "Admin Command Center",
+    "live-monitor": "Live Monitor",
     analytics: "Analytics",
     alerts: "All Alerts",
     "alert-details": "Alert Details",
