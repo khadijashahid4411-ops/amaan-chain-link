@@ -66,15 +66,15 @@ export const UserStats = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {stats.map((s) => (
         <Card key={s.label}>
-          <CardContent className="pt-4 pb-4">
-            <div className={`flex items-center gap-1.5 text-xs ${s.tone}`}>
-              <s.icon className="h-3.5 w-3.5" />
-              <span className="truncate">{s.label}</span>
+          <CardContent className="pt-5 pb-5">
+            <div className={`flex items-center gap-2 text-sm font-medium ${s.tone}`}>
+              <s.icon className="h-4 w-4 shrink-0" />
+              <span className="break-words leading-tight">{s.label}</span>
             </div>
-            <div className="text-2xl font-bold mt-1">{s.value}</div>
+            <div className="text-3xl font-bold mt-2">{s.value}</div>
           </CardContent>
         </Card>
       ))}
