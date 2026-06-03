@@ -50,6 +50,8 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
 import { cn } from "@/lib/utils";
+import { MapLegend } from "@/components/MapLegend";
+import { statusMarkerColor } from "@/lib/alertColors";
 import { AlertFilters } from "@/components/AlertFilters";
 import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
 import {
@@ -72,6 +74,7 @@ type Evidence = Database["public"]["Tables"]["evidence"]["Row"];
 
 type SectionId =
   | "home"
+  | "live-monitor"
   | "analytics"
   | "alerts"
   | "alert-details"
@@ -94,6 +97,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const NAV: { id: SectionId; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Home", icon: Home },
+  { id: "live-monitor", label: "Live Monitor", icon: Siren },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "alerts", label: "All Alerts", icon: Siren },
   { id: "alert-details", label: "Alert Details", icon: ListChecks },
@@ -273,8 +277,8 @@ const AdminDashboard = () => {
     id: a.id,
     lat: a.lat,
     lng: a.lng,
-    color: a.status === "solved" ? "success" : a.status === "pending" ? "primary" : "accent",
-    title: a.description.slice(0, 40),
+    color: statusMarkerColor(a.status),
+    title: `${a.status.replace("_", " ")} — ${a.description.slice(0, 40)}`,
   }));
 
   const filteredUsers = useMemo(() => {
