@@ -16,6 +16,8 @@ import Complaints from "./pages/Complaints.tsx";
 import UserEvidence from "./pages/UserEvidence.tsx";
 import ResponderEvidence from "./pages/ResponderEvidence.tsx";
 import BecomeResponderPage from "./pages/BecomeResponderPage.tsx";
+import EvidenceGuide from "./pages/EvidenceGuide.tsx";
+import Appearance from "./pages/Appearance.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -100,6 +102,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Shell><BecomeResponderPage /></Shell>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/evidence-guide"
+              element={
+                <ProtectedRoute>
+                  <Shell><EvidenceGuide /></Shell>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/appearance"
+              element={
+                <ProtectedRoute>
+                  <Shell><Appearance /></Shell>
                 </ProtectedRoute>
               }
             />
