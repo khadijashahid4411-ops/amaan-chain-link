@@ -44,6 +44,7 @@ const UserDashboard = () => {
   const { coords, error: geoErr, loading: geoLoading, retry: retryGeo } = useGeolocation();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [responders, setResponders] = useState<Record<string, Responder>>({});
+  const [onDutyResponders, setOnDutyResponders] = useState<Responder[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [priority, setPriority] = useState<"low" | "medium" | "high" | "critical">("high");
   const [description, setDescription] = useState("");
@@ -82,6 +83,28 @@ const UserDashboard = () => {
       supabase.removeChannel(ch);
     };
   }, [user]);
+
+  // Load on-duty responders for map visibility
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("responders")
+        .select("*")
+        .eq("status", "approved")
+        .eq("is_active", true)
+        .not("current_lat", "is", null)
+        .not("current_lng", "is", null);
+      setOnDutyResponders(data ?? []);
+    };
+    load();
+    const ch = supabase
+      .channel("on-duty-responders")
+      .on("postgres_changes", { event: "*", schema: "public", table: "responders" }, load)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
 
   const submit = async () => {
     if (!coords) {
