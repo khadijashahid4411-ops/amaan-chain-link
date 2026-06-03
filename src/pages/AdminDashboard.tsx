@@ -413,8 +413,10 @@ const AdminDashboard = () => {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle>Live alert map</CardTitle>
+          <CardDescription>Color-coded by status. Click "Live Monitor" for a focused in-progress view.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
+          <MapLegend />
           <div className="h-72 rounded-lg overflow-hidden">
             <LiveMap
               center={alerts[0] ? { lat: alerts[0].lat, lng: alerts[0].lng } : { lat: 30.3753, lng: 69.3451 }}
@@ -425,6 +427,91 @@ const AdminDashboard = () => {
       </Card>
     </div>
   );
+
+  const LiveMonitorSection = () => {
+    const liveAlerts = alerts.filter((a) => ["pending", "accepted", "in_progress"].includes(a.status));
+    const inProgress = liveAlerts.filter((a) => a.status === "in_progress");
+    const liveMarkers: MapMarkerSpec[] = liveAlerts.map((a) => ({
+      id: a.id,
+      lat: a.lat,
+      lng: a.lng,
+      color: statusMarkerColor(a.status),
+      title: `${a.status.replace("_", " ")} — ${a.description.slice(0, 40)}`,
+    }));
+    // also add assigned responder pins
+    liveAlerts.forEach((a) => {
+      if (!a.assigned_responder_id) return;
+      const r = responders.find((x) => x.id === a.assigned_responder_id);
+      if (r?.current_lat != null && r?.current_lng != null) {
+        liveMarkers.push({
+          id: `r-${r.id}-${a.id}`,
+          lat: r.current_lat,
+          lng: r.current_lng,
+          color: "success",
+          title: `${profiles[r.user_id]?.display_name ?? "Responder"} → ${a.description.slice(0, 30)}`,
+        });
+      }
+    });
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard icon={Siren} label="Pending" value={liveAlerts.filter((a) => a.status === "pending").length} accent="primary" />
+          <StatCard icon={CheckCircle2} label="Accepted" value={liveAlerts.filter((a) => a.status === "accepted").length} accent="accent" />
+          <StatCard icon={Loader2} label="In progress" value={inProgress.length} accent="primary" />
+          <StatCard icon={ShieldCheck} label="Live total" value={liveAlerts.length} />
+        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>All active alerts on one map</CardTitle>
+            <CardDescription>Real-time view of every live emergency and the responder assigned to it.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <MapLegend />
+            <div className="h-[28rem] rounded-lg overflow-hidden">
+              <LiveMap
+                center={liveAlerts[0] ? { lat: liveAlerts[0].lat, lng: liveAlerts[0].lng } : { lat: 30.3753, lng: 69.3451 }}
+                zoom={11}
+                markers={liveMarkers}
+                onMarkerClick={(id) => {
+                  if (liveAlerts.find((a) => a.id === id)) {
+                    setSelectedAlert(id);
+                    setSection("alert-details");
+                  }
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>In-progress responses ({inProgress.length})</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {inProgress.length === 0 && <p className="text-sm text-muted-foreground">No alerts currently in progress.</p>}
+            {inProgress.map((a) => {
+              const r = responders.find((x) => x.id === a.assigned_responder_id);
+              const rp = r ? profiles[r.user_id] : null;
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => { setSelectedAlert(a.id); setSection("alert-details"); }}
+                  className="w-full text-left border rounded-lg p-3 hover:bg-muted/40 transition-smooth"
+                >
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge className={STATUS_COLORS[a.status]}>{a.status.replace("_", " ")}</Badge>
+                    <Badge variant="outline" className="capitalize">{a.priority}</Badge>
+                    <span className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm mt-1.5">{a.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Reporter: {profiles[a.user_id]?.display_name ?? "—"} • Responder: {rp?.display_name ?? "—"}
+                  </p>
+                </button>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
 
   const AnalyticsSection = () => (
     <div className="space-y-6">
