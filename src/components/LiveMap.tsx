@@ -134,5 +134,31 @@ export const LiveMap = ({ center, zoom = 14, markers = [], className, onMarkerCl
     }
   }, [route]);
 
+  // Sync radius circle
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!circle) {
+      if (circleRef.current) {
+        circleRef.current.setMap(null);
+        circleRef.current = null;
+      }
+      return;
+    }
+    const opts: google.maps.CircleOptions = {
+      center: circle.center,
+      radius: circle.radiusKm * 1000,
+      strokeColor: circle.color ?? "#0ea5e9",
+      strokeOpacity: 0.7,
+      strokeWeight: 2,
+      fillColor: circle.color ?? "#0ea5e9",
+      fillOpacity: 0.08,
+    };
+    if (!circleRef.current) {
+      circleRef.current = new google.maps.Circle({ map: mapRef.current, ...opts });
+    } else {
+      circleRef.current.setOptions(opts);
+    }
+  }, [circle?.center.lat, circle?.center.lng, circle?.radiusKm, circle?.color]);
+
   return <div ref={ref} className={className ?? "h-full w-full rounded-xl overflow-hidden"} />;
 };
