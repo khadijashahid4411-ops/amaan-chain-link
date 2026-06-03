@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LiveMap, MapMarkerSpec } from "@/components/LiveMap";
+import { MapLegend } from "@/components/MapLegend";
 import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { UserStats } from "@/components/UserStats";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle, Navigation } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { haversineKm, estimateEtaMinutes } from "@/lib/eta";
+import { statusMarkerColor } from "@/lib/alertColors";
 import { z } from "zod";
 
 type Alert = Database["public"]["Tables"]["alerts"]["Row"];
