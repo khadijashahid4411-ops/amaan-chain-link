@@ -234,9 +234,15 @@ const UserDashboard = () => {
         <p className="text-muted-foreground">Send alerts and track responders in real time.</p>
       </header>
 
+      <OfflineIndicator />
+      <GeofenceBanner coords={coords ?? null} />
+
       <section id="stats" className="scroll-mt-6">
         <UserStats />
       </section>
+
+      <HotlinesPanel />
+
 
       <div id="active" className="grid lg:grid-cols-2 gap-6 scroll-mt-6">
         {/* Alert form / active alert */}
