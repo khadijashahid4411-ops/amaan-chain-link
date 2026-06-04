@@ -122,6 +122,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/evidence-library"
+              element={
+                <ProtectedRoute>
+                  <Shell><EvidenceLibrary /></Shell>
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
