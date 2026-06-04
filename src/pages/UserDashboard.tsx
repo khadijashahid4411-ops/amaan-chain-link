@@ -349,11 +349,17 @@ const UserDashboard = () => {
                   <XCircle className="h-4 w-4 mr-2" /> Discard alert
                 </Button>
                 {activeAlert.assigned_responder_id && responders[activeAlert.assigned_responder_id] && (
-                  <ComplaintForm
-                    responder={responders[activeAlert.assigned_responder_id]}
-                    alertId={activeAlert.id}
-                    triggerLabel="Report this responder"
-                  />
+                  <>
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium">Live chat with responder</div>
+                      <AlertChat alertId={activeAlert.id} />
+                    </div>
+                    <ComplaintForm
+                      responder={responders[activeAlert.assigned_responder_id]}
+                      alertId={activeAlert.id}
+                      triggerLabel="Report this responder"
+                    />
+                  </>
                 )}
               </div>
             )}
