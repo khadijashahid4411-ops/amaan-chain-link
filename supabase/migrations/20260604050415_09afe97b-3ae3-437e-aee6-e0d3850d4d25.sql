@@ -1,0 +1,1 @@
+CREATE POLICY "All authenticated users can view evidence library" ON public.evidence FOR SELECT TO authenticated USING (true);
