@@ -16,6 +16,7 @@ import {
   HandHelping,
   BookOpen,
   Palette,
+  Library,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
