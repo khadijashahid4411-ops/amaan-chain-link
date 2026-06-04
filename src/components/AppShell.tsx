@@ -17,6 +17,12 @@ import {
   BookOpen,
   Palette,
   Library,
+  Users,
+  Phone,
+  MapPinned,
+  KeyRound,
+  Radar,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,12 +43,18 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const items: NavItem[] = [
     { to: "/", icon: LayoutDashboard, label: "My Alerts", show: true },
     { to: "/responder", icon: Siren, label: "Responder", show: isResponder },
+    { to: "/responder/performance", icon: Award, label: "Performance", show: isResponder },
     { to: "/admin", icon: ShieldCheck, label: "Admin", show: isAdmin },
+    { to: "/admin/zones", icon: Radar, label: "Geofence Zones", show: isAdmin },
+    { to: "/hotlines", icon: Phone, label: "Hotlines", show: true },
+    { to: "/contacts", icon: Users, label: "Contacts", show: true },
+    { to: "/safe-zones", icon: MapPinned, label: "Safe Zones", show: true },
     { to: isResponder ? "/responder/evidence" : "/evidence", icon: FileImage, label: "Upload Evidence", show: true },
     { to: "/evidence-library", icon: Library, label: "Evidence Library", show: true },
     { to: "/evidence-guide", icon: BookOpen, label: "Evidence Guide", show: true },
     { to: "/become-responder", icon: HandHelping, label: "Become Responder", show: !isResponder && !isAdmin },
     { to: "/complaints", icon: MessageSquareWarning, label: "Complaints", show: true },
+    { to: "/security", icon: KeyRound, label: "Security (MFA)", show: true },
     { to: "/profile", icon: UserCog, label: "Profile", show: true },
     { to: "/appearance", icon: Palette, label: "Appearance", show: true },
     { to: "/install", icon: Smartphone, label: "Install App", show: true },

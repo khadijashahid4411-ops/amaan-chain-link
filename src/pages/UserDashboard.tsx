@@ -15,6 +15,11 @@ import { EvidenceUpload } from "@/components/EvidenceUpload";
 import { EvidenceList } from "@/components/EvidenceList";
 import { UserStats } from "@/components/UserStats";
 import { ComplaintForm } from "@/components/ComplaintForm";
+import { HotlinesPanel } from "@/components/HotlinesPanel";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { GeofenceBanner } from "@/components/GeofenceBanner";
+import { AlertChat } from "@/components/AlertChat";
+import { enqueueAlert } from "@/lib/offlineQueue";
 import { toast } from "sonner";
 import { Siren, MapPin, Loader2, Clock, CheckCircle2, Star, XCircle, Navigation } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -117,6 +122,24 @@ const UserDashboard = () => {
       return;
     }
     setSubmitting(true);
+
+    // Offline path
+    if (!navigator.onLine) {
+      await enqueueAlert({
+        id: crypto.randomUUID(),
+        user_id: user!.id,
+        description: parsed.data.description,
+        priority: parsed.data.priority,
+        lat: coords.lat,
+        lng: coords.lng,
+        queued_at: Date.now(),
+      });
+      setSubmitting(false);
+      setDescription("");
+      toast.success("Saved offline. Will send automatically when back online.");
+      return;
+    }
+
     const { error } = await supabase.from("alerts").insert({
       user_id: user!.id,
       description: parsed.data.description,
@@ -211,9 +234,15 @@ const UserDashboard = () => {
         <p className="text-muted-foreground">Send alerts and track responders in real time.</p>
       </header>
 
+      <OfflineIndicator />
+      <GeofenceBanner coords={coords ?? null} />
+
       <section id="stats" className="scroll-mt-6">
         <UserStats />
       </section>
+
+      <HotlinesPanel />
+
 
       <div id="active" className="grid lg:grid-cols-2 gap-6 scroll-mt-6">
         {/* Alert form / active alert */}
@@ -320,11 +349,17 @@ const UserDashboard = () => {
                   <XCircle className="h-4 w-4 mr-2" /> Discard alert
                 </Button>
                 {activeAlert.assigned_responder_id && responders[activeAlert.assigned_responder_id] && (
-                  <ComplaintForm
-                    responder={responders[activeAlert.assigned_responder_id]}
-                    alertId={activeAlert.id}
-                    triggerLabel="Report this responder"
-                  />
+                  <>
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium">Live chat with responder</div>
+                      <AlertChat alertId={activeAlert.id} />
+                    </div>
+                    <ComplaintForm
+                      responder={responders[activeAlert.assigned_responder_id]}
+                      alertId={activeAlert.id}
+                      triggerLabel="Report this responder"
+                    />
+                  </>
                 )}
               </div>
             )}
