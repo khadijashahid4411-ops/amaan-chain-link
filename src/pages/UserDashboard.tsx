@@ -122,6 +122,24 @@ const UserDashboard = () => {
       return;
     }
     setSubmitting(true);
+
+    // Offline path
+    if (!navigator.onLine) {
+      await enqueueAlert({
+        id: crypto.randomUUID(),
+        user_id: user!.id,
+        description: parsed.data.description,
+        priority: parsed.data.priority,
+        lat: coords.lat,
+        lng: coords.lng,
+        queued_at: Date.now(),
+      });
+      setSubmitting(false);
+      setDescription("");
+      toast.success("Saved offline. Will send automatically when back online.");
+      return;
+    }
+
     const { error } = await supabase.from("alerts").insert({
       user_id: user!.id,
       description: parsed.data.description,
