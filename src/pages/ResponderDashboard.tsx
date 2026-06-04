@@ -323,6 +323,13 @@ const ResponderDashboard = () => {
                     small
                   />
                 </div>
+                {coords && (
+                  <RouteOptions origin={coords} destination={{ lat: a.lat, lng: a.lng }} />
+                )}
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">Live chat with citizen</div>
+                  <AlertChat alertId={a.id} />
+                </div>
                 <EvidenceList alertId={a.id} />
                 <EvidenceUpload alertId={a.id} />
               </CardContent>
