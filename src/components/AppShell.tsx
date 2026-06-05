@@ -19,7 +19,7 @@ import {
   Library,
   Users,
   Phone,
-  MapPinned,
+  
   KeyRound,
   Radar,
   Award,
