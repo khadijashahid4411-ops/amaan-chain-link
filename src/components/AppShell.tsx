@@ -19,7 +19,7 @@ import {
   Library,
   Users,
   Phone,
-  MapPinned,
+  
   KeyRound,
   Radar,
   Award,
@@ -48,7 +48,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
     { to: "/admin/zones", icon: Radar, label: "Geofence Zones", show: isAdmin },
     { to: "/hotlines", icon: Phone, label: "Hotlines", show: true },
     { to: "/contacts", icon: Users, label: "Contacts", show: true },
-    { to: "/safe-zones", icon: MapPinned, label: "Safe Zones", show: true },
+    
     { to: isResponder ? "/responder/evidence" : "/evidence", icon: FileImage, label: "Upload Evidence", show: true },
     { to: "/evidence-library", icon: Library, label: "Evidence Library", show: true },
     { to: "/evidence-guide", icon: BookOpen, label: "Evidence Guide", show: true },

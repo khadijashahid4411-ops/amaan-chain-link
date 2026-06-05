@@ -21,7 +21,7 @@ import Appearance from "./pages/Appearance.tsx";
 import EvidenceLibrary from "./pages/EvidenceLibrary.tsx";
 import EmergencyContacts from "./pages/EmergencyContacts.tsx";
 import Hotlines from "./pages/Hotlines.tsx";
-import SafeZones from "./pages/SafeZones.tsx";
+
 import Security from "./pages/Security.tsx";
 import AdminZones from "./pages/AdminZones.tsx";
 import ResponderPerformance from "./pages/ResponderPerformance.tsx";
@@ -59,7 +59,7 @@ const App = () => (
             <Route path="/evidence-library" element={wrap(<EvidenceLibrary />)} />
             <Route path="/contacts" element={wrap(<EmergencyContacts />)} />
             <Route path="/hotlines" element={wrap(<Hotlines />)} />
-            <Route path="/safe-zones" element={wrap(<SafeZones />)} />
+            
             <Route path="/security" element={wrap(<Security />)} />
             <Route path="/admin/zones" element={wrap(<AdminZones />, "admin")} />
             <Route path="/responder/performance" element={wrap(<ResponderPerformance />)} />
