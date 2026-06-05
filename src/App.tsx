@@ -21,7 +21,7 @@ import Appearance from "./pages/Appearance.tsx";
 import EvidenceLibrary from "./pages/EvidenceLibrary.tsx";
 import EmergencyContacts from "./pages/EmergencyContacts.tsx";
 import Hotlines from "./pages/Hotlines.tsx";
-import SafeZones from "./pages/SafeZones.tsx";
+
 import Security from "./pages/Security.tsx";
 import AdminZones from "./pages/AdminZones.tsx";
 import ResponderPerformance from "./pages/ResponderPerformance.tsx";
