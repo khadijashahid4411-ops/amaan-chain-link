@@ -59,7 +59,7 @@ const App = () => (
             <Route path="/evidence-library" element={wrap(<EvidenceLibrary />)} />
             <Route path="/contacts" element={wrap(<EmergencyContacts />)} />
             <Route path="/hotlines" element={wrap(<Hotlines />)} />
-            <Route path="/safe-zones" element={wrap(<SafeZones />)} />
+            
             <Route path="/security" element={wrap(<Security />)} />
             <Route path="/admin/zones" element={wrap(<AdminZones />, "admin")} />
             <Route path="/responder/performance" element={wrap(<ResponderPerformance />)} />
