@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_messages: {
+        Row: {
+          alert_id: string
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          alert_id: string
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          alert_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_messages_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alert_rejections: {
         Row: {
           alert_id: string
@@ -187,6 +219,39 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          id: string
+          is_priority: boolean
+          name: string
+          phone: string
+          relation: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_priority?: boolean
+          name: string
+          phone: string
+          relation?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_priority?: boolean
+          name?: string
+          phone?: string
+          relation?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       evidence: {
         Row: {
           alert_id: string | null
@@ -257,6 +322,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      geo_zones: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          lat: number
+          lng: number
+          message: string
+          name: string
+          radius_km: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          lat: number
+          lng: number
+          message: string
+          name: string
+          radius_km?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          lat?: number
+          lng?: number
+          message?: string
+          name?: string
+          radius_km?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
