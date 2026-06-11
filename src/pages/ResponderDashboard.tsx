@@ -16,9 +16,6 @@ import { EvidenceList } from "@/components/EvidenceList";
 import { AlertFilters } from "@/components/AlertFilters";
 import { ComplaintAgainstUser } from "@/components/ComplaintAgainstUser";
 import { ResponderStats } from "@/components/ResponderStats";
-import { RouteOptions } from "@/components/RouteOptions";
-import { AlertChat } from "@/components/AlertChat";
-import { HotlinesPanel } from "@/components/HotlinesPanel";
 import { AlertFilterState, emptyFilters, filterAlerts } from "@/lib/alertFilters";
 import { statusMarkerColor } from "@/lib/alertColors";
 import { toast } from "sonner";
@@ -325,13 +322,6 @@ const ResponderDashboard = () => {
                     triggerLabel="Report this user"
                     small
                   />
-                </div>
-                {coords && (
-                  <RouteOptions origin={coords} destination={{ lat: a.lat, lng: a.lng }} />
-                )}
-                <div className="space-y-1">
-                  <div className="text-sm font-medium">Live chat with citizen</div>
-                  <AlertChat alertId={a.id} />
                 </div>
                 <EvidenceList alertId={a.id} />
                 <EvidenceUpload alertId={a.id} />
